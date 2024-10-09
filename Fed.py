@@ -22,9 +22,7 @@ def parse_args():
     parser.add_argument('--dim', default=128, type=int)
     parser.add_argument('--lr', default=0.001, type=float)
     parser.add_argument('--epochs', default=3000, type=int)
-    parser.add_argument('--lamda', default=1, type=float)
-    parser.add_argument('--margin', default=0.9, type=float)
-    parser.add_argument('--neg', default=1, type=int)
+    parser.add_argument('--rounds', default=5, type=int)
     return parser.parse_args()
 
 class FedUA(torch.nn.Module):
@@ -34,12 +32,6 @@ class FedUA(torch.nn.Module):
         self.conv2 = GCNConv(t_input, 2 * output)
         self.conv3 = GCNConv(2 * output, output)
         self.activation = nn.ReLU()
-        # self.dropout = dropout
-        # self.is_bn = is_bn
-        # self.bn1 = BatchNorm(2 * output)
-        # self.bn2 = BatchNorm(2 * output)
-        # self.share = not not_share
-        # self.conv4 = GCNConv(2 * output, output)
 
     def s_forward(self, x, edge_index):
         '''
@@ -211,66 +203,61 @@ def sample(anchor_train, gs, gt, neg=1):
 
     return ina, inb, cosine_target
 
-def expand_edges(g_s, g_t, seeds, s_edge, t_edge):
-    '''
-    Cross Network Extension shown as PALE: Predict Anchor Links across Social Networks via an Embedding Approach
-    '''
-    seed_list1 = seeds.T[0]
-    seed_list2 = seeds.T[1]
-    for i in range(len(seed_list1) - 1):
-        for j in range(i + 1, len(seed_list1)):
-            if not g_s.has_edge(seed_list1[i], seed_list1[j]) and g_t.has_edge(seed_list2[i], seed_list2[j]):
-                g_s.add_edge(seed_list1[i], seed_list1[j])
-                s_edge = torch.hstack((s_edge, torch.LongTensor([[seed_list1[i], seed_list1[j]], [seed_list1[j], seed_list1[i]]])))
-            if g_s.has_edge(seed_list1[i], seed_list1[j]) and not g_t.has_edge(seed_list2[i], seed_list2[j]):
-                g_t.add_edge(seed_list2[i], seed_list2[j])
-                t_edge = torch.hstack((t_edge, torch.LongTensor([[seed_list2[i], seed_list2[j]], [seed_list2[j], seed_list2[i]]])))
-    return g_s, g_t, s_edge, t_edge
 
-def to_word2vec_format(val_embeddings, out_dir, filename, pref=""):
-    '''
-    save embeddings to 'out_dir/filename.txt'
-    '''
-    val_embeddings = val_embeddings.detach().cpu().numpy()
-
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-
-    num=val_embeddings.shape[0]
-    dim=val_embeddings.shape[1]
-
-    with open("{0}/{1}".format(out_dir, filename), 'w') as f_out:
-        f_out.write("%s %s\n"%(num, dim))
-        for node in range(num):
-            txt_vector = ["%s" % val_embeddings[node][j] for j in range(dim)]
-            f_out.write("%s%s %s\n" % (pref, node, " ".join(txt_vector)))
-        f_out.close()
-    print("Emb has been saved to: {0}/{1}".format(out_dir, filename))
-
-def local_train_on_network(s_x, t_x, s_e, t_e, g_s, g_t, anchor, gt_mat, dim, lr, lamda, margin, neg, epochs):
+def local_training(s_x, t_x, s_e, t_e, epochs=1000, lr=0.001):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    s_x, t_x, s_e, t_e = s_x.to(device), t_x.to(device), s_e.to(device), t_e.to(device)
-    model = FedUA(s_input=s_x.shape[1], t_input=t_x.shape[1], output=dim).to(device)
+    model = FedUA(s_x.shape[1], t_x.shape[1], 128).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     for epoch in range(epochs):
         model.train()
         optimizer.zero_grad()
-        zs = model.s_forward(s_x, s_e)
-        zt = model.t_forward(t_x, t_e)
-        intra_loss = model.intra_loss(zs, zt, s_e, t_e)
-        # 这里可以加上inter_loss计算
-        loss = intra_loss  # + inter_loss * lamda
+        zs = model.s_forward(s_x.to(device), s_e.to(device))
+        zt = model.t_forward(t_x.to(device), t_e.to(device))
+        loss = model.intra_loss(zs, zt, s_e, t_e)
         loss.backward()
         optimizer.step()
 
-    return model.state_dict()  # 返回模型参数
+    # Return local model state dict and loss
+    return model.state_dict(), loss.item()
 
-def aggregate_models(model_params_list):
-    global_model_params = {}
-    for key in model_params_list[0].keys():
-        global_model_params[key] = sum([model_params[key] for model_params in model_params_list]) / len(model_params_list)
-    return global_model_params
+def upload_weights(model_weights):
+    # Simulate uploading model weights to server
+    # In practice, you would use a secure communication method
+    return model_weights
+
+def aggregate_weights(local_weights):
+    global_weights = {}
+    for key in local_weights[0].keys():
+        global_weights[key] = torch.mean(torch.stack([local_weights[i][key] for i in range(len(local_weights))]), dim=0)
+    return global_weights
+
+def federated_training(s_data, t_data, epochs=5):
+    local_weights = []
+    for _ in range(epochs):
+        s_weights, s_loss = local_training(*s_data)
+        t_weights, t_loss = local_training(*t_data)
+
+        # Upload weights to server
+        local_weights.append(upload_weights(s_weights))
+        local_weights.append(upload_weights(t_weights))
+
+        # Aggregate weights
+        global_weights = aggregate_weights(local_weights)
+        
+        # Update global model (simulated)
+        # In practice, you'd load these weights back into the model
+
+    return global_weights
+
+def evaluate(model, s_x, t_x, s_e, t_e, gt_matrix):
+    model.eval()
+    with torch.no_grad():
+        zs = model.s_forward(s_x, s_e)
+        zt = model.t_forward(t_x, t_e)
+        S = cosine_similarity(zs.cpu(), zt.cpu())
+        result = get_statistics(S, gt_matrix)
+    return result
 
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
@@ -313,33 +300,35 @@ if __name__ == "__main__":
         t1 = time1 - start_time
         print('Finished in %.4f s!'%(t1))
 
-        # print('Expand edges...')
-        # g_s, g_t, s_e, t_e = expand_edges(g_s, g_t, train_anchor, s_e, t_e)
-
         print('Generate embeddings...')
         s_embedding, t_embedding= get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, train_anchor, groundtruth_matrix, dim=args.dim,\
              lr=args.lr, epochs=args.epochs, lamda=args.lamda, margin=args.margin, neg=args.neg)
-
+        s_data = (s_x, t_x, s_e, t_e)
+        t_data = (t_x, s_x, t_e, s_e)  # Simulate the data for the second user
+        global_model_weights = federated_training(s_data, t_data, epochs=5)
         t2 = time() - time1
         print('Finished in %.4f s!'%(t2))
 
-        # to_word2vec_format(s_embedding, args.out_path, 'source_emb')
-        # to_word2vec_format(t_embedding, args.out_path, 'target_emb')
+        # Save the global model weights
+        torch.save(global_model_weights, os.path.join(args.out_path, 'global_model_weights.pth'))
+        print('Global model weights saved.')
 
-        print('Evaluating...')
-        S = cosine_similarity(s_embedding, t_embedding)
-        result = get_statistics(S, groundtruth_matrix)
+        # Load the model with the global weights for evaluation
+        model = FedUA(s_x.shape[1], t_x.shape[1], 128)
+        model.load_state_dict(global_model_weights)
+
+        print('Evaluating the global model...')
+        evaluation_results = evaluate(model, s_x, t_x, s_e, t_e, groundtruth_matrix)
         t3 = time() - start_time
-        for k, v in result.items():
-            print('%s: %.4f' % (k, v))
-            results[k] += v
-
+        for k, v in evaluation_results.items():
+            print(f'{k}: {v:.4f}')
         results['time'] += t3
         print('Total runtime: %.4f s'%(t3))
+
     for k in results.keys():
         results[k] /= N
         
-    print('\nCCNE')
+    print('\nFedUA')
     print(args)
     print('Average results:')
     for k, v in results.items():
