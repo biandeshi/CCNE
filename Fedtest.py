@@ -79,7 +79,7 @@ def get_intra_loss(s_model, t_model):
     return s_model.intra_loss + t_model.intra_loss
 
 
-def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, anchor, gt_mat, dim=64, lr=0.001, lamda=1, margin=0.8, neg=1, epochs=1000):
+def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat, dim=64, lr=0.001, lamda=1, margin=0.8, neg=1, epochs=1000):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     s_x = s_x.to(device)
     t_x = t_x.to(device)
@@ -125,7 +125,7 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, anchor, gt_mat, dim=64, lr=0.001
     t_embedding = t_model.forward(t_x, t_e)
     s_embedding = s_embedding.detach().cpu()
     t_embedding = t_embedding.detach().cpu()
-    return s_embedding, t_embedding
+    return s_model.state_dict(), t_model.state_dict(), s_embedding, t_embedding
 
 @torch.no_grad()
 def evaluate(zs, zt, gt):
@@ -228,16 +228,27 @@ if __name__ == "__main__":
         t1 = time1 - start_time
         print('Finished in %.4f s!'%(t1))
 
-        client_data = [(s_x, t_x, s_e, t_e, g_s, g_t, train_anchor, groundtruth_matrix)]
 
-        if initial_model is None:
-            initial_model = FedUA(s_x.shape[1], t_x.shape[1], 64)  # Initialize model
+        if globel_model is None:
+            s_model = FedUA(s_x.shape[1], args.dim)
+            t_model = FedUA(t_x.shape[1], args.dim)
+            globel_model = s_model
+            global_model_state_dict = globel_model.state_dict()
 
         # Perform federated training
-        global_model_state_dict = federated_training(client_data, initial_model, global_epochs=10)
+        for round in range(args.rounds):
+            client_data = [(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix)]
+            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(*client_data, args.dim, 
+                            args.lr, args.lamda, args.margin, args.neg, args.epochs)
+            for key in global_model_state_dict.keys():
+                global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
+            for key in s_state_dict.keys():
+                s_model.state_dict()[key] = (global_model_state_dict[key] + s_state_dict[key]) / 2
+            for key in t_state_dict.keys():
+                t_model.state_dict()[key] = (global_model_state_dict[key] + t_state_dict[key]) / 2
 
         # Load global model for final evaluation
-        initial_model.load_state_dict(global_model_state_dict)
+        globel_model.load_state_dict(global_model_state_dict)
         S = cosine_similarity(s_x, t_x)  # Example evaluation logic
         result = get_statistics(S, groundtruth_matrix)
 
