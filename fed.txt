@@ -1,0 +1,85 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 28.7564 s!
+Epoch: 000, intra_loss: 5.03085518, inter_loss: 0.33471781, loss_train: 5.36557293, precision_10: 0.01564246
+Epoch: 100, intra_loss: 1.55428374, inter_loss: 0.11081857, loss_train: 1.66510236, precision_10: 0.47486034
+Epoch: 200, intra_loss: 1.53600252, inter_loss: 0.06058114, loss_train: 1.59658360, precision_10: 0.60670391
+Epoch: 300, intra_loss: 1.51268864, inter_loss: 0.04329986, loss_train: 1.55598855, precision_10: 0.61787709
+Epoch: 400, intra_loss: 1.50511813, inter_loss: 0.03483299, loss_train: 1.53995109, precision_10: 0.64245810
+Epoch: 500, intra_loss: 1.50321317, inter_loss: 0.03018876, loss_train: 1.53340197, precision_10: 0.64916201
+Epoch: 600, intra_loss: 1.48980236, inter_loss: 0.02738527, loss_train: 1.51718760, precision_10: 0.64692737
+Epoch: 700, intra_loss: 1.48136926, inter_loss: 0.02528932, loss_train: 1.50665855, precision_10: 0.65027933
+Epoch: 800, intra_loss: 1.48613620, inter_loss: 0.02372269, loss_train: 1.50985885, precision_10: 0.64581006
+Epoch: 900, intra_loss: 1.48068714, inter_loss: 0.02230344, loss_train: 1.50299060, precision_10: 0.65474860
+Epoch: 000, intra_loss: 1.46774232, inter_loss: 0.02141305, loss_train: 1.48915541, precision_10: 0.64804469
+Epoch: 100, intra_loss: 1.46936917, inter_loss: 0.02049364, loss_train: 1.48986280, precision_10: 0.64581006
+Epoch: 200, intra_loss: 1.47206235, inter_loss: 0.01965279, loss_train: 1.49171519, precision_10: 0.65027933
+Epoch: 300, intra_loss: 1.46496856, inter_loss: 0.01890720, loss_train: 1.48387575, precision_10: 0.64692737
+Epoch: 400, intra_loss: 1.46429110, inter_loss: 0.01798976, loss_train: 1.48228085, precision_10: 0.65474860
+Epoch: 500, intra_loss: 1.46314573, inter_loss: 0.01758842, loss_train: 1.48073411, precision_10: 0.65810056
+Epoch: 600, intra_loss: 1.46365309, inter_loss: 0.01663115, loss_train: 1.48028421, precision_10: 0.65474860
+Epoch: 700, intra_loss: 1.46343029, inter_loss: 0.01590903, loss_train: 1.47933936, precision_10: 0.65027933
+Epoch: 800, intra_loss: 1.45456767, inter_loss: 0.01530812, loss_train: 1.46987581, precision_10: 0.65363128
+Epoch: 900, intra_loss: 1.46406639, inter_loss: 0.01499107, loss_train: 1.47905743, precision_10: 0.64916201
+Epoch: 000, intra_loss: 1.46297908, inter_loss: 0.01450702, loss_train: 1.47748613, precision_10: 0.65474860
+Epoch: 100, intra_loss: 1.45716691, inter_loss: 0.01408152, loss_train: 1.47124839, precision_10: 0.65139665
+Epoch: 200, intra_loss: 1.47550929, inter_loss: 0.01364069, loss_train: 1.48914993, precision_10: 0.65251397
+Epoch: 300, intra_loss: 1.45457530, inter_loss: 0.01327699, loss_train: 1.46785235, precision_10: 0.65474860
+Epoch: 400, intra_loss: 1.45402074, inter_loss: 0.01299951, loss_train: 1.46702027, precision_10: 0.64692737
+Epoch: 500, intra_loss: 1.45523810, inter_loss: 0.01267513, loss_train: 1.46791327, precision_10: 0.64581006
+Epoch: 600, intra_loss: 1.45644665, inter_loss: 0.01232263, loss_train: 1.46876931, precision_10: 0.65139665
+Epoch: 700, intra_loss: 1.46284437, inter_loss: 0.01207584, loss_train: 1.47492027, precision_10: 0.65586592
+Epoch: 800, intra_loss: 1.45977354, inter_loss: 0.01165295, loss_train: 1.47142649, precision_10: 0.65921788
+Epoch: 900, intra_loss: 1.45758605, inter_loss: 0.01151188, loss_train: 1.46909797, precision_10: 0.65363128
+Epoch: 000, intra_loss: 1.45603454, inter_loss: 0.01133413, loss_train: 1.46736872, precision_10: 0.65363128
+Epoch: 100, intra_loss: 1.45130539, inter_loss: 0.01090033, loss_train: 1.46220577, precision_10: 0.64804469
+Epoch: 200, intra_loss: 1.45881128, inter_loss: 0.01080095, loss_train: 1.46961224, precision_10: 0.65586592
+Epoch: 300, intra_loss: 1.46593595, inter_loss: 0.01069090, loss_train: 1.47662687, precision_10: 0.65027933
+Epoch: 400, intra_loss: 1.44708347, inter_loss: 0.01057674, loss_train: 1.45766020, precision_10: 0.64804469
+Epoch: 500, intra_loss: 1.45429111, inter_loss: 0.01038987, loss_train: 1.46468103, precision_10: 0.65810056
+Epoch: 600, intra_loss: 1.44183016, inter_loss: 0.01013958, loss_train: 1.45196974, precision_10: 0.64581006
+Epoch: 700, intra_loss: 1.45239139, inter_loss: 0.01000904, loss_train: 1.46240044, precision_10: 0.64804469
+Epoch: 800, intra_loss: 1.44140899, inter_loss: 0.00994329, loss_train: 1.45135224, precision_10: 0.65363128
+Epoch: 900, intra_loss: 1.45192671, inter_loss: 0.00970905, loss_train: 1.46163571, precision_10: 0.64692737
+Epoch: 000, intra_loss: 1.44779706, inter_loss: 0.00941058, loss_train: 1.45720768, precision_10: 0.64692737
+Epoch: 100, intra_loss: 1.45271373, inter_loss: 0.00933497, loss_train: 1.46204865, precision_10: 0.64692737
+Epoch: 200, intra_loss: 1.45885825, inter_loss: 0.00927457, loss_train: 1.46813285, precision_10: 0.64804469
+Epoch: 300, intra_loss: 1.44602442, inter_loss: 0.00927085, loss_train: 1.45529532, precision_10: 0.64916201
+Epoch: 400, intra_loss: 1.45295370, inter_loss: 0.00906757, loss_train: 1.46202123, precision_10: 0.64469274
+Epoch: 500, intra_loss: 1.44604445, inter_loss: 0.00900891, loss_train: 1.45505333, precision_10: 0.64245810
+Epoch: 600, intra_loss: 1.44815814, inter_loss: 0.00892085, loss_train: 1.45707905, precision_10: 0.64357542
+Epoch: 700, intra_loss: 1.44713330, inter_loss: 0.00873806, loss_train: 1.45587134, precision_10: 0.64469274
+Epoch: 800, intra_loss: 1.45393515, inter_loss: 0.00857941, loss_train: 1.46251452, precision_10: 0.64134078
+Epoch: 900, intra_loss: 1.45160544, inter_loss: 0.00874498, loss_train: 1.46035039, precision_10: 0.64469274
+True matched nodes: 208
+Total test nodes: 895
+Acc: 0.2324
+MRR: 0.3405
+AUC: 0.9500
+Hit: 0.9500
+Precision@1: 0.1922
+Precision@5: 0.5196
+Precision@10: 0.6570
+Precision@15: 0.7095
+Precision@20: 0.7419
+Precision@25: 0.7642
+Precision@30: 0.7821
+Total runtime: 146.6241 s
+
+CCNE with Federated Learning
+Namespace(dim=128, epochs=1000, gt_path='data/douban/anchor/node,split=0.2.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/douban/embeddings', rounds=5, s_edge='data/douban/online/raw/edgelist', t_edge='data/douban/offline/raw/edgelist', train_path='data/douban/anchor/node,split=0.2.train.dict')
+Average results:
+Acc: 0.2324
+MRR: 0.3405
+AUC: 0.9500
+Hit: 0.9500
+Precision@1: 0.1922
+Precision@5: 0.5196
+Precision@10: 0.6570
+Precision@15: 0.7095
+Precision@20: 0.7419
+Precision@25: 0.7642
+Precision@30: 0.7821
+time: 146.6241

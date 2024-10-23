@@ -23,6 +23,9 @@ def parse_args():
     parser.add_argument('--lr', default=0.001, type=float)
     parser.add_argument('--epochs', default=10, type=int)
     parser.add_argument('--rounds', default=5, type=int)
+    parser.add_argument('--lamda', default=1, type=float)
+    parser.add_argument('--margin', default=0.9, type=float)
+    parser.add_argument('--neg', default=1, type=int)
     return parser.parse_args()
 
 class FedUA(torch.nn.Module):
@@ -85,10 +88,8 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
     t_x = t_x.to(device)
     s_e = s_e.to(device)
     t_e = t_e.to(device)
-    s_input = s_x.shape[1]
-    t_input = t_x.shape[1]
-    s_model = FedUA(s_input, dim).to(device)
-    t_model = FedUA(t_input, dim).to(device)
+    s_model = s_model.to(device)
+    t_model = t_model.to(device)
 
     s_optimizer = torch.optim.Adam(s_model.parameters(), lr=lr)
     t_optimizer = torch.optim.Adam(t_model.parameters(), lr=lr)
@@ -228,30 +229,29 @@ if __name__ == "__main__":
         t1 = time1 - start_time
         print('Finished in %.4f s!'%(t1))
 
-
-        if globel_model is None:
-            s_model = FedUA(s_x.shape[1], args.dim)
-            t_model = FedUA(t_x.shape[1], args.dim)
-            globel_model = s_model
-            global_model_state_dict = globel_model.state_dict()
+        # initial model
+        s_model = FedUA(s_x.shape[1], args.dim)
+        t_model = FedUA(t_x.shape[1], args.dim)
+        globel_model = s_model
+        global_model_state_dict = globel_model.state_dict()
 
         # Perform federated training
+        print("Performing federated learning...\n")
         for round in range(args.rounds):
-            client_data = [(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix)]
-            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(*client_data, args.dim, 
+            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
                             args.lr, args.lamda, args.margin, args.neg, args.epochs)
+            # Merge local model
             for key in global_model_state_dict.keys():
                 global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
+            # Distribute globel model to local
             for key in s_state_dict.keys():
                 s_model.state_dict()[key] = (global_model_state_dict[key] + s_state_dict[key]) / 2
             for key in t_state_dict.keys():
                 t_model.state_dict()[key] = (global_model_state_dict[key] + t_state_dict[key]) / 2
 
-        # Load global model for final evaluation
-        globel_model.load_state_dict(global_model_state_dict)
-        S = cosine_similarity(s_x, t_x)  # Example evaluation logic
+        print("Finished federated learning!\n")
+        S = cosine_similarity(s_embedding, t_embedding)  # Example evaluation logic
         result = get_statistics(S, groundtruth_matrix)
-
         t3 = time() - start_time
         for k, v in result.items():
             print(f'{k}: {v:.4f}')
