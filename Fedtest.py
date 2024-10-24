@@ -26,6 +26,8 @@ def parse_args():
     parser.add_argument('--lamda', default=1, type=float)
     parser.add_argument('--margin', default=0.9, type=float)
     parser.add_argument('--neg', default=1, type=int)
+    # Percentage of the globel model
+    parser.add_argument('--alpha', default=1.0, type=float)
     return parser.parse_args()
 
 class FedUA(torch.nn.Module):
@@ -96,6 +98,7 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
     cosine_loss=nn.CosineEmbeddingLoss(margin=margin)
     in_a, in_b, anchor_label = sample(anchor, g_s, g_t, neg=neg) # hard negative sampling
 
+    print("Federated local learning...\n")
     for epoch in range(epochs):
         s_model.train()
         t_model.train()
@@ -120,6 +123,7 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
             print('Epoch: {:03d}, intra_loss: {:.8f}, inter_loss: {:.8f}, loss_train: {:.8f}, precision_10: {:.8f}'.format(epoch,\
                 intra_loss, inter_loss, loss, p10))
     
+    print("Federated local learning has been done...\n")
     s_model.eval()
     t_model.eval()
     s_embedding = s_model.forward(s_x, s_e)
@@ -161,15 +165,15 @@ def sample(anchor_train, gs, gt, neg=1):
         input_b.append(b)
         an_target = torch.ones(anchor_flag)
         classifier_target = torch.cat((classifier_target, an_target), dim=0)
-        # an_negs_index = list(set(node_t) - {b}) # all nodes except anchor node
-        an_negs_index = list(gt.neighbors(b)) # neighbors of each anchor node
+        an_negs_index = list(set(gt.nodes()) - {b}) # all nodes except anchor node
+        # an_negs_index = list(gt.neighbors(b)) # neighbors of each anchor node
         an_negs_index_sampled = list(np.random.choice(an_negs_index, triplet_neg, replace=True)) # randomly sample negatives
         an_as = triplet_neg * [a]
         input_a += an_as
         input_b += an_negs_index_sampled
 
-        # an_negs_index1 = list(set(node_f) - {a})
-        an_negs_index1 = list(gs.neighbors(a))
+        an_negs_index1 = list(set(gs.nodes()) - {a})
+        # an_negs_index1 = list(gs.neighbors(a))
         an_negs_index_sampled1 = list(np.random.choice(an_negs_index1, triplet_neg, replace=True))
         an_as1 = triplet_neg * [b]
         input_b += an_as1
@@ -245,9 +249,9 @@ if __name__ == "__main__":
                 global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
             # Distribute globel model to local
             for key in s_state_dict.keys():
-                s_model.state_dict()[key] = (global_model_state_dict[key] + s_state_dict[key]) / 2
+                s_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + s_state_dict[key] * (1 - args.alpha)
             for key in t_state_dict.keys():
-                t_model.state_dict()[key] = (global_model_state_dict[key] + t_state_dict[key]) / 2
+                t_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + t_state_dict[key] * (1 - args.alpha)
 
         print("Finished federated learning!\n")
         S = cosine_similarity(s_embedding, t_embedding)  # Example evaluation logic
