@@ -1,9 +1,9 @@
-PD=data/douban
-PREFIX1=online
-PREFIX2=offline
+PD=data/twitter1_youtube
+PREFIX1=twitter1
+PREFIX2=youtube
 TRAINRATIO=0.2
 
-python ccne.py \
+python CCNE.py \
 --s_edge ${PD}/${PREFIX1}/raw/edgelist \
 --t_edge ${PD}/${PREFIX2}/raw/edgelist \
 --gt_path ${PD}/anchor/node,split=${TRAINRATIO}.test.dict \

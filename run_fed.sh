@@ -1,13 +1,14 @@
-DATASET=douban
+DATASET=twitter1_youtube
 PD=data/${DATASET}
-PREFIX1=online
-PREFIX2=offline
+PREFIX1=twitter1
+PREFIX2=youtube
 TRAINRATIO=0.2
 LR=0.001
 EPOCHS=1000
 ALPHA=1.0
 
-python Fedtest.py \
+mkdir output/${DATASET}
+python FedWoNeg.py \
 --s_edge ${PD}/${PREFIX1}/raw/edgelist \
 --t_edge ${PD}/${PREFIX2}/raw/edgelist \
 --gt_path ${PD}/anchor/node,split=${TRAINRATIO}.test.dict \

@@ -86,11 +86,11 @@ def get_intra_loss(s_model, t_model):
 
 def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat, dim=64, lr=0.001, lamda=1, margin=0.8, neg=1, epochs=1000):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # add centrality features
-    s_c = calculate_centrality_features(g_s)
-    t_c = calculate_centrality_features(g_t)
-    s_x = torch.cat((s_x, s_c), 1)
-    t_x = torch.cat((t_x, t_c), 1)
+    # # add centrality features
+    # s_c = calculate_centrality_features(g_s)
+    # t_c = calculate_centrality_features(g_t)
+    # s_x = torch.cat((s_x, s_c), 1)
+    # t_x = torch.cat((t_x, t_c), 1)
     s_x = s_x.to(device)
     t_x = t_x.to(device)
     s_e = s_e.to(device)
