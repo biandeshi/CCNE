@@ -1,10 +1,11 @@
-PD=data/douban
+DATASET=douban
+PD=data/${DATASET}
 PREFIX1=online
 PREFIX2=offline
 TRAINRATIO=0.2
 LR=0.001
-EPOCHS=300
-ALPHA=0.8
+EPOCHS=1000
+ALPHA=1.0
 
 python Fedtest.py \
 --s_edge ${PD}/${PREFIX1}/raw/edgelist \
@@ -15,4 +16,4 @@ python Fedtest.py \
 --dim 128 \
 --lr ${LR} \
 --epochs ${EPOCHS} \
---alpha ${ALPHA} > output_lr_${LR}_epochs_${EPOCHS}_alpha_${ALPHA}.txt
+--alpha ${ALPHA} > output/${DATASET}/${PREFIX1}_${PREFIX2}_lr=${LR}_epochs=${EPOCHS}_alpha=${ALPHA}.txt
