@@ -17,4 +17,4 @@ python FedWoNeg.py \
 --dim 128 \
 --lr ${LR} \
 --epochs ${EPOCHS} \
---alpha ${ALPHA} > output/${DATASET}/${PREFIX1}_${PREFIX2}_lr=${LR}_epochs=${EPOCHS}_alpha=${ALPHA}.txt
+--alpha ${ALPHA} > output/${DATASET}/FedWoNeg_${PREFIX1}_${PREFIX2}_lr=${LR}_epochs=${EPOCHS}_alpha=${ALPHA}.txt

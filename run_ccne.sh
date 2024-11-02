@@ -1,6 +1,6 @@
-PD=data/twitter1_youtube
-PREFIX1=twitter1
-PREFIX2=youtube
+PD=data/douban
+PREFIX1=online
+PREFIX2=offline
 TRAINRATIO=0.2
 
 python CCNE.py \

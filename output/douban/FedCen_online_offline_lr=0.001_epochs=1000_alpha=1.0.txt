@@ -1,0 +1,131 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 31.3618 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 230
+Total test nodes: 895
+Acc: 0.2570
+MRR: 0.3655
+AUC: 0.9549
+Hit: 0.9549
+Precision@1: 0.2201
+Precision@5: 0.5497
+Precision@10: 0.6559
+Precision@15: 0.7084
+Precision@20: 0.7419
+Precision@25: 0.7765
+Precision@30: 0.7855
+Total runtime: 375.9483 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 31.3543 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 216
+Total test nodes: 895
+Acc: 0.2413
+MRR: 0.3609
+AUC: 0.9430
+Hit: 0.9430
+Precision@1: 0.2179
+Precision@5: 0.5374
+Precision@10: 0.6570
+Precision@15: 0.7207
+Precision@20: 0.7497
+Precision@25: 0.7788
+Precision@30: 0.7933
+Total runtime: 380.2516 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 29.4810 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 230
+Total test nodes: 895
+Acc: 0.2570
+MRR: 0.3707
+AUC: 0.9442
+Hit: 0.9442
+Precision@1: 0.2335
+Precision@5: 0.5441
+Precision@10: 0.6514
+Precision@15: 0.7296
+Precision@20: 0.7575
+Precision@25: 0.7844
+Precision@30: 0.8022
+Total runtime: 377.9955 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 29.4764 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 227
+Total test nodes: 895
+Acc: 0.2536
+MRR: 0.3674
+AUC: 0.9457
+Hit: 0.9458
+Precision@1: 0.2201
+Precision@5: 0.5520
+Precision@10: 0.6536
+Precision@15: 0.7140
+Precision@20: 0.7531
+Precision@25: 0.7777
+Precision@30: 0.8000
+Total runtime: 378.1063 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 29.7019 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 216
+Total test nodes: 895
+Acc: 0.2413
+MRR: 0.3680
+AUC: 0.9545
+Hit: 0.9545
+Precision@1: 0.2268
+Precision@5: 0.5464
+Precision@10: 0.6503
+Precision@15: 0.7207
+Precision@20: 0.7587
+Precision@25: 0.7788
+Precision@30: 0.7955
+Total runtime: 378.2953 s
+
+CCNE with Federated Learning
+Namespace(alpha=1.0, dim=128, epochs=1000, gt_path='data/douban/anchor/node,split=0.2.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/douban/embeddings', rounds=5, s_edge='data/douban/online/raw/edgelist', t_edge='data/douban/offline/raw/edgelist', train_path='data/douban/anchor/node,split=0.2.train.dict')
+Average results:
+Acc: 0.2501
+MRR: 0.3665
+AUC: 0.9484
+Hit: 0.9485
+Precision@1: 0.2237
+Precision@5: 0.5459
+Precision@10: 0.6536
+Precision@15: 0.7187
+Precision@20: 0.7522
+Precision@25: 0.7792
+Precision@30: 0.7953
+time: 378.1194
