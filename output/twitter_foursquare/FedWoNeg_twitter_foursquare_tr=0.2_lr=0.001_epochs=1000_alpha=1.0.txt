@@ -1,0 +1,28 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 156.9913 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 100
+Total test nodes: 1288
+Total runtime: 1850.3532 s
+
+CCNE with Federated Learning
+Namespace(alpha=1.0, dim=128, epochs=1000, gt_path='data/twitter_foursquare/anchor/node,split=0.2.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/twitter_foursquare/embeddings', rounds=5, s_edge='data/twitter_foursquare/twitter/raw/edgelist', t_edge='data/twitter_foursquare/foursquare/raw/edgelist', train_path='data/twitter_foursquare/anchor/node,split=0.2.train.dict')
+Average results:
+Acc: 0.0776
+MRR: 0.1167
+AUC: 0.8922
+Hit: 0.8923
+Precision@1: 0.0559
+Precision@5: 0.1724
+Precision@10: 0.2492
+Precision@15: 0.2935
+Precision@20: 0.3253
+Precision@25: 0.3610
+Precision@30: 0.3843
+time: 1850.3532

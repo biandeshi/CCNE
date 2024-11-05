@@ -40,3 +40,21 @@ for TRAINRATIO in $(seq 0.1 0.1 0.9);do
     --epochs ${EPOCHS} \
     --alpha ${ALPHA} > output/${DATASET}/FedWoNeg_${PREFIX1}_${PREFIX2}_tr=${TRAINRATIO}_lr=${LR}_epochs=${EPOCHS}_alpha=${ALPHA}.txt
 done
+
+DATASET=twitter1_youtube
+PD=data/${DATASET}
+PREFIX1=twitter1
+PREFIX2=youtube
+
+for TRAINRATIO in $(seq 0.1 0.1 0.9);do
+    python FedWoNeg.py \
+    --s_edge ${PD}/${PREFIX1}/raw/edgelist \
+    --t_edge ${PD}/${PREFIX2}/raw/edgelist \
+    --gt_path ${PD}/anchor/node,split=${TRAINRATIO}.test.dict \
+    --train_path ${PD}/anchor/node,split=${TRAINRATIO}.train.dict \
+    --out_path ${PD}/embeddings \
+    --dim 128 \
+    --lr ${LR} \
+    --epochs ${EPOCHS} \
+    --alpha ${ALPHA} > output/${DATASET}/FedWoNeg_${PREFIX1}_${PREFIX2}_tr=${TRAINRATIO}_lr=${LR}_epochs=${EPOCHS}_alpha=${ALPHA}.txt
+done
