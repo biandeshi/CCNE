@@ -3,6 +3,7 @@ import re
 import matplotlib.pyplot as plt
 
 datasets = ['douban', 'twitter1_youtube', 'twitter_foursquare']
+FILENAME = 'FedWoNeg'
 
 def extract_results(file_path):
     results = {}
@@ -25,7 +26,7 @@ def plot_ratio_mmr_p10():
         p10s = []
         output_dir = f'output/{datasets[i]}'
         for train_ratio in [x / 10.0 for x in range(1, 10)]:
-            file_name = f'FedWoNeg_tr={train_ratio}.txt'
+            file_name = f'{FILENAME}_tr={train_ratio}.txt'
             file_path = os.path.join(output_dir, file_name)
 
             if os.path.exists(file_path):

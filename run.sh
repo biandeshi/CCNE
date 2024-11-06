@@ -8,6 +8,10 @@ ALPHA=1.0
 LR=0.001
 RUNFILE=FedWoNeg
 
+mkdir output/${DATASETS[0]}
+mkdir output/${DATASETS[1]}
+mkdir output/${DATASETS[2]}
+
 for i in "${!DATASETS[@]}"; do
     DATASET=${DATASETS[$i]}
     PREFIX1=${PREFIX1S[$i]}
