@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DATASETS=(douban twitter_foursquare twitter1_youtube)
-PREFIX1S=(online twitter foursquare)
+PREFIX1S=(online twitter twitter1)
 PREFIX2S=(offline foursquare youtube)
 EPOCHS=200
 ALPHA=1.0
@@ -32,10 +32,10 @@ for i in "${!DATASETS[@]}"; do
     done
 done
 
-DATASET=twitter1_youtube
+DATASET=${DATASETS[2]}
 PD=data/${DATASET}
-PREFIX1=twitter
-PREFIX2=youtube
+PREFIX1=${PREFIX1S[2]}
+PREFIX2=${PREFIX2S[2]}
 TRAINRATIO=0.9
 
 for margin in $(seq 0.1 0.1 1.0);do
