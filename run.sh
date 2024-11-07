@@ -69,7 +69,7 @@ done
 
 for alpha in $(seq 0.0 0.1 1.0);do
     python ${RUNFILE}.py \
-    --s_edge ${PD}/${PREFIX1}/raw/edgelist \    
+    --s_edge ${PD}/${PREFIX1}/raw/edgelist \
     --t_edge ${PD}/${PREFIX2}/raw/edgelist \
     --gt_path ${PD}/anchor/node,split=${TRAINRATIO}.test.dict \
     --train_path ${PD}/anchor/node,split=${TRAINRATIO}.train.dict \
