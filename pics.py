@@ -3,7 +3,6 @@ import re
 import matplotlib.pyplot as plt
 
 datasets = ['douban', 'twitter1_youtube', 'twitter_foursquare']
-FILENAME = 'FedWoNeg'
 
 def extract_results(file_path):
     results = {}
@@ -26,7 +25,7 @@ def plot_ratio_mmr_p10():
         p10s = []
         output_dir = f'output/{datasets[i]}'
         for train_ratio in [x / 10.0 for x in range(1, 10)]:
-            file_name = f'{FILENAME}_tr={train_ratio}.txt'
+            file_name = f'FedWoNeg_tr={train_ratio}.txt'
             file_path = os.path.join(output_dir, file_name)
 
             if os.path.exists(file_path):
@@ -52,9 +51,9 @@ def plot_ratio_mmr_p10():
     plt.savefig('pics/ratio_mrr_p10.png')
     plt.tight_layout()
 
-def plot_margin_dim_alpha():
+def plot_margin_dim():
     dataset = datasets[1]
-    fig, axs = plt.subplots(1, 3, figsize=(16, 6))
+    fig, axs = plt.subplots(1, 2, figsize=(16, 6))
 
     output_dir = f'output/{dataset}'
     p10s = []
@@ -95,29 +94,10 @@ def plot_margin_dim_alpha():
     axs[1].set_title(f'Precision@10 vs Dim for {dataset}')
     axs[1].grid(True)
 
-    p10s = []
-
-    for i in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-        alpha = i
-        filename = f'FedWoNeg_alpha={alpha}.txt'
-        file_path = os.path.join(output_dir, filename)
-
-        if os.path.exists(file_path):
-            results = extract_results(file_path)
-            p10s.append(results['Precision@10'])
-        else:
-            print(f"Warning: {file_path} not found.")
-
-    axs[2].plot([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], p10s, marker='o', label='Precision@10')
-    axs[2].set_xlabel('Alpha')
-    axs[2].set_ylabel('Precision@10')
-    axs[2].set_title(f'Precision@10 vs Alpha for {dataset}')
-    axs[2].grid(True)
-
-    plt.savefig('pics/margin_dim_alpha.png')
+    plt.savefig('pics/margin_dim.png')
     plt.tight_layout()
 
 
 if __name__ == '__main__':
     plot_ratio_mmr_p10()
-    plot_margin_dim_alpha()
+    plot_margin_dim()

@@ -38,7 +38,7 @@ PREFIX1=${PREFIX1S[2]}
 PREFIX2=${PREFIX2S[2]}
 TRAINRATIO=0.9
 
-for margin in $(seq 0.1 0.1 1.0);do
+for margin in $(seq 0.0 0.1 1.0);do
     python ${RUNFILE}.py \
     --s_edge ${PD}/${PREFIX1}/raw/edgelist \
     --t_edge ${PD}/${PREFIX2}/raw/edgelist \
