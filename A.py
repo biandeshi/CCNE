@@ -74,7 +74,7 @@ def a_star(start_board, heuristic_func=manhattan_distance):
 
 # Example usage
 if __name__ == "__main__":
-    initial_board = [1, 2, 3, 4, 5, 6, 7, 0, 8]  # Example initial state
+    initial_board = [1, 2, 3, 6, 5, 4, 0, 7, 8]  # Example initial state
     print("Using Manhattan Distance:")
     moves = a_star(initial_board, heuristic_func=manhattan_distance)
     if moves != -1:

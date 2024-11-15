@@ -188,6 +188,43 @@ def calculate_centrality_features(graph):
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
         'Precision@20', 'Precision@25', 'Precision@30', 'time'), 0) # save results
+    
+    start_time = time()
+    args = parse_args()
+
+    print('Load data...')
+    # genetate adjacency matrix
+    s_adj = get_adj(args.s_edge)
+    t_adj = get_adj(args.t_edge)
+    # generate edge_index(pyG version)
+    s_e = get_edgeindex(args.s_edge)
+    t_e = get_edgeindex(args.t_edge)
+    s_num = s_adj.shape[0]
+    t_num = t_adj.shape[0]
+    # load train anchor links
+    train_anchor = torch.LongTensor(np.loadtxt(args.train_path, dtype=int))
+    # generate test anchor matrix for evaluation
+    groundtruth_matrix = get_gt_matrix(args.gt_path, (s_num, t_num))
+
+    # generate graph for negative sampling
+    s_edge = np.loadtxt(args.s_edge, dtype=int)
+    t_edge = np.loadtxt(args.t_edge, dtype=int)
+    g_s = nx.Graph()
+    g_s.add_edges_from(s_edge)
+    g_t = nx.Graph()
+    g_t.add_edges_from(t_edge)
+
+    print('Generate deepwalk embeddings as input X...')
+    s_x = node2vec(s_adj, P=1, Q=1, WINDOW_SIZE=10, NUM_WALKS=10, WALK_LENGTH=80, DIMENSIONS=128, \
+        WORKERS=8, ITER=5, verbose=1)
+    t_x = node2vec(t_adj, P=1, Q=1, WINDOW_SIZE=10, NUM_WALKS=10, WALK_LENGTH=80, DIMENSIONS=128, \
+        WORKERS=8, ITER=5, verbose=1)
+    s_x = torch.FloatTensor(s_x)
+    t_x = torch.FloatTensor(t_x)
+    time1 = time()
+    t1 = time1 - start_time
+    print('Finished in %.4f s!'%(t1))
+
     N = 1000
     fig, axs = plt.subplots(1, 3, figsize=(16, 6))
     p1 = []
@@ -195,42 +232,6 @@ if __name__ == "__main__":
     mrr = []
     epochs = []
     for epoch in range(N + 1):
-        start_time = time()
-        args = parse_args()
-
-        print('Load data...')
-        # genetate adjacency matrix
-        s_adj = get_adj(args.s_edge)
-        t_adj = get_adj(args.t_edge)
-        # generate edge_index(pyG version)
-        s_e = get_edgeindex(args.s_edge)
-        t_e = get_edgeindex(args.t_edge)
-        s_num = s_adj.shape[0]
-        t_num = t_adj.shape[0]
-        # load train anchor links
-        train_anchor = torch.LongTensor(np.loadtxt(args.train_path, dtype=int))
-        # generate test anchor matrix for evaluation
-        groundtruth_matrix = get_gt_matrix(args.gt_path, (s_num, t_num))
-
-        # generate graph for negative sampling
-        s_edge = np.loadtxt(args.s_edge, dtype=int)
-        t_edge = np.loadtxt(args.t_edge, dtype=int)
-        g_s = nx.Graph()
-        g_s.add_edges_from(s_edge)
-        g_t = nx.Graph()
-        g_t.add_edges_from(t_edge)
-
-        print('Generate deepwalk embeddings as input X...')
-        s_x = node2vec(s_adj, P=1, Q=1, WINDOW_SIZE=10, NUM_WALKS=10, WALK_LENGTH=80, DIMENSIONS=128, \
-            WORKERS=8, ITER=5, verbose=1)
-        t_x = node2vec(t_adj, P=1, Q=1, WINDOW_SIZE=10, NUM_WALKS=10, WALK_LENGTH=80, DIMENSIONS=128, \
-            WORKERS=8, ITER=5, verbose=1)
-        s_x = torch.FloatTensor(s_x)
-        t_x = torch.FloatTensor(t_x)
-        time1 = time()
-        t1 = time1 - start_time
-        print('Finished in %.4f s!'%(t1))
-
         # initial model
         s_model = FedUA(s_x.shape[1], args.dim)
         t_model = FedUA(t_x.shape[1], args.dim)
@@ -238,7 +239,7 @@ if __name__ == "__main__":
         global_model_state_dict = globel_model.state_dict()
 
         # Perform federated training
-        print("Performing federated learning...\n")
+        # print("Performing federated learning...\n")
         for round in range(args.rounds):
             s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
                             args.lr, args.lamda, args.margin, args.neg, epoch)
@@ -251,23 +252,24 @@ if __name__ == "__main__":
             for key in t_state_dict.keys():
                 t_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + t_state_dict[key] * (1 - args.alpha)
 
-        print("Finished federated learning!\n")
+        # print("Finished federated learning!\n")
         S = cosine_similarity(s_embedding, t_embedding)  # Example evaluation logic
         result = get_statistics(S, groundtruth_matrix)
         t3 = time() - start_time
-        for k, v in result.items():
+        # for k, v in result.items():
             # print(f'{k}: {v:.4f}')
-            results[k] += v
+            # results[k] += v
 
-        results['time'] += t3
+        # results['time'] += t3
         # print(f'Total runtime: {t3:.4f} s')
         p1.append(result['Precision@1'])
         p10.append(result['Precision@10'])
         mrr.append(result['MRR'])
         epochs.append(epoch)
+        print(f"=== round {epoch} ===")
 
-    for i, lists, labels in zip(range(3), [p1, p10, mrr], ['Precision@1', 'Precision@10', 'MRR']):
-        axs[i].plot(epochs, lists, marker='o', label=labels)
+    for i, output, labels in zip(range(3), [p1, p10, mrr], ['Precision@1', 'Precision@10', 'MRR']):
+        axs[i].plot(epochs, output, label=labels)
         axs[i].set_xlabel('Epoch')
         axs[i].set_ylabel(labels)
         axs[i].set_title(f'{labels} vs Epoch')
