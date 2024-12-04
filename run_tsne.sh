@@ -3,10 +3,10 @@
 DATASETS=(douban twitter_foursquare twitter1_youtube)
 PREFIX1S=(online twitter twitter1)
 PREFIX2S=(offline foursquare youtube)
-EPOCHS=400
+EPOCHS=100
 ALPHA=1.0
 LR=0.001
-RUNFILE=FedRdm
+RUNFILE=picTSNE
 
 mkdir output/${DATASETS[0]}
 mkdir output/${DATASETS[1]}
@@ -27,4 +27,4 @@ python ${RUNFILE}.py \
 --dim 128 \
 --lr ${LR} \
 --epochs ${EPOCHS} \
---alpha ${ALPHA} > output/${DATASET}/${RUNFILE}_test.txt
+--alpha ${ALPHA}

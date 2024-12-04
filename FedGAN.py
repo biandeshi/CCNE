@@ -86,6 +86,11 @@ def get_intra_loss(s_model, t_model):
 
 def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat, dim=64, lr=0.001, lamda=1, margin=0.8, neg=1, epochs=1000):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # add centrality features
+    s_c = calculate_centrality_features(g_s)
+    t_c = calculate_centrality_features(g_t)
+    s_x = torch.cat((s_x, s_c), 1)
+    t_x = torch.cat((t_x, t_c), 1)
     s_x = s_x.to(device)
     t_x = t_x.to(device)
     s_e = s_e.to(device)
@@ -225,9 +230,15 @@ if __name__ == "__main__":
         t1 = time1 - start_time
         print('Finished in %.4f s!'%(t1))
 
+        # add centrality features
+        s_c = calculate_centrality_features(g_s)
+        t_c = calculate_centrality_features(g_t)
+        s_x_c = torch.cat((s_x, s_c), 1)
+        t_x_c = torch.cat((t_x, t_c), 1)
+
         # initial model
-        s_model = FedUA(s_x.shape[1], args.dim)
-        t_model = FedUA(t_x.shape[1], args.dim)
+        s_model = FedUA(s_x_c.shape[1], args.dim)
+        t_model = FedUA(t_x_c.shape[1], args.dim)
         globel_model = s_model
         global_model_state_dict = globel_model.state_dict()
 
@@ -250,7 +261,7 @@ if __name__ == "__main__":
         result = get_statistics(S, groundtruth_matrix)
         t3 = time() - start_time
         for k, v in result.items():
-            # print(f'{k}: {v:.4f}')
+            print(f'{k}: {v:.4f}')
             results[k] += v
 
         results['time'] += t3

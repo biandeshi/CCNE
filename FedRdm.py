@@ -96,7 +96,7 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
     s_optimizer = torch.optim.Adam(s_model.parameters(), lr=lr)
     t_optimizer = torch.optim.Adam(t_model.parameters(), lr=lr)
     cosine_loss=nn.CosineEmbeddingLoss(margin=margin)
-    in_a, in_b, anchor_label = sample(anchor) # no hard negative sampling
+    in_a, in_b, anchor_label = sample(anchor, g_s, g_t, neg=neg) # no hard negative sampling
 
     # print("Federated local learning...")
     for epoch in range(epochs):
@@ -144,28 +144,48 @@ def evaluate(zs, zt, gt):
     precision_10 = compute_precision_k(pred_top_10, gt)
     return precision_10
 
-def sample(anchor_train):
+def sample(anchor_train, gs, gt, neg=1):
     '''
-    sample for each anchor without negative sampling
+    sample non-anchors for each anchor
     '''
+    triplet_neg = neg  # number of non-anchors for each anchor, when neg=1, there are two negtives for each anchor
+    anchor_flag = 1
     anchor_train_len = anchor_train.shape[0]
     anchor_train_a_list = np.array(anchor_train.T[0])
     anchor_train_b_list = np.array(anchor_train.T[1])
     input_a = []
     input_b = []
     classifier_target = torch.empty(0)
-    
-    for index in range(anchor_train_len):
+    np.random.seed(5)
+    index = 0
+    while index < anchor_train_len:
         a = anchor_train_a_list[index]
         b = anchor_train_b_list[index]
-        
         input_a.append(a)
         input_b.append(b)
-        an_target = torch.ones(1)  
+        an_target = torch.ones(anchor_flag)
         classifier_target = torch.cat((classifier_target, an_target), dim=0)
+        an_negs_index = list(set(gt.nodes()) - {b}) # all nodes except anchor node
+        # an_negs_index = list(gt.neighbors(b)) # neighbors of each anchor node
+        an_negs_index_sampled = list(np.random.choice(an_negs_index, triplet_neg, replace=True)) # randomly sample negatives
+        an_as = triplet_neg * [a]
+        input_a += an_as
+        input_b += an_negs_index_sampled
 
-    cosine_target = torch.unsqueeze(2 * classifier_target - 1, dim=1)  # labels are [1]
-    
+        an_negs_index1 = list(set(gs.nodes()) - {a})
+        # an_negs_index1 = list(gs.neighbors(a))
+        an_negs_index_sampled1 = list(np.random.choice(an_negs_index1, triplet_neg, replace=True))
+        an_as1 = triplet_neg * [b]
+        input_b += an_as1
+        input_a += an_negs_index_sampled1
+
+        un_an_target = torch.zeros(triplet_neg * 2)
+        classifier_target = torch.cat((classifier_target, un_an_target), dim=0)
+        index += 1
+
+    cosine_target = torch.unsqueeze(2 * classifier_target - 1, dim=1)  # labels are [1,-1,-1]
+    # classifier_target = torch.unsqueeze(classifier_target, dim=1)  # labels are [1,0,0]
+
     # [ina, inb] is all anchors and sampled non-anchors, cosine_target is their labels
     ina = torch.LongTensor(input_a)
     inb = torch.LongTensor(input_b)
@@ -187,7 +207,7 @@ def calculate_centrality_features(graph):
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
         'Precision@20', 'Precision@25', 'Precision@30', 'time'), 0) # save results
-    N = 5 # repeat times for average, default: 1
+    N = 1 # repeat times for average, default: 1
     for i in range(N):
         start_time = time()
         args = parse_args()
@@ -225,16 +245,22 @@ if __name__ == "__main__":
         t1 = time1 - start_time
         print('Finished in %.4f s!'%(t1))
 
+        # add centrality features
+        s_c = calculate_centrality_features(g_s)
+        t_c = calculate_centrality_features(g_t)
+        s_x_c = torch.cat((s_x, s_c), 1)
+        t_x_c = torch.cat((t_x, t_c), 1)
+
         # initial model
-        s_model = FedUA(s_x.shape[1], args.dim)
-        t_model = FedUA(t_x.shape[1], args.dim)
+        s_model = FedUA(s_x_c.shape[1], args.dim)
+        t_model = FedUA(t_x_c.shape[1], args.dim)
         globel_model = s_model
         global_model_state_dict = globel_model.state_dict()
 
         # Perform federated training
         print("Performing federated learning...\n")
         for round in range(args.rounds):
-            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
+            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x_c, t_x_c, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
                             args.lr, args.lamda, args.margin, args.neg, args.epochs)
             # Merge local model
             for key in global_model_state_dict.keys():
