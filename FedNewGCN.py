@@ -11,6 +11,7 @@ from time import time
 import argparse
 import os
 import networkx as nx
+from InductiveGCN import InductiveGCN
 
 def parse_args():
     parser = argparse.ArgumentParser(description="CCNE")
@@ -33,8 +34,8 @@ def parse_args():
 class FedUA(torch.nn.Module):
     def __init__(self, input, output):#, not_share=False, is_bn=False, dropout=0):
         super().__init__()
-        self.conv1 = GCNConv(input, 2 * output)
-        self.conv2 = GCNConv(2 * output, output)
+        self.conv1 = InductiveGCN(input, 2 * output)
+        self.conv2 = InductiveGCN(2 * output, output)
         self.activation = nn.ReLU()
         self.intra_loss = 0
 
@@ -95,15 +96,16 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
 
     s_optimizer = torch.optim.Adam(s_model.parameters(), lr=lr)
     t_optimizer = torch.optim.Adam(t_model.parameters(), lr=lr)
+    cosine_loss=nn.CosineEmbeddingLoss(margin=margin)
+    in_a, in_b, anchor_label = sample(anchor) # no hard negative sampling
 
-    # 移除与inter_loss相关的采样操作，此处先注释掉，若后续有其他作用可适当调整保留部分逻辑
-    # in_a, in_b, anchor_label = sample(anchor) 
-
+    # print("Federated local learning...")
     for epoch in range(epochs):
         s_model.train()
         t_model.train()
         s_optimizer.zero_grad()
         t_optimizer.zero_grad()
+        # in_a, in_b, anchor_label = sample(anchor, g_s, g_t, neg=neg)
         zs = s_model.forward(s_x, s_e)
         zt = t_model.forward(t_x, t_e)
         
@@ -111,10 +113,18 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
         t_model.single_recon_loss(zt, t_e)
 
         intra_loss = s_model.intra_loss + t_model.intra_loss
-        intra_loss.backward()
+        anchor_label = anchor_label.view(-1).to(device)
+        inter_loss = cosine_loss(zs[in_a], zt[in_b], anchor_label)
+        loss = intra_loss + lamda * inter_loss
+        loss.backward()
         s_optimizer.step()
         t_optimizer.step()
-
+        if epoch % 100 == 0:
+            p10 = evaluate(zs, zt, gt_mat)
+            print('Epoch: {:03d}, intra_loss: {:.8f}, inter_loss: {:.8f}, loss_train: {:.8f}, precision_10: {:.8f}'.format(epoch,\
+                intra_loss, inter_loss, loss, p10))
+    
+    # print("Federated local learning has been done...\n")
     s_model.eval()
     t_model.eval()
     s_embedding = s_model.forward(s_x, s_e)
@@ -122,18 +132,6 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
     s_embedding = s_embedding.detach().cpu()
     t_embedding = t_embedding.detach().cpu()
     return s_model.state_dict(), t_model.state_dict(), s_embedding, t_embedding
-    
-    # # 仅使用intra_loss进行训练
-    # for model, x, e in [(s_model, s_x, s_e), (t_model, t_x, t_e)]:
-    #     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    #     for epoch in range(epochs):
-    #         model.train()
-    #         optimizer.zero_grad()
-    #         z = model.forward(x, e)
-    #         model.single_recon_loss(z, e)
-    #         loss = model.intra_loss
-    #         loss.backward()
-    #         optimizer.step()
 
 @torch.no_grad()
 def evaluate(zs, zt, gt):
@@ -175,13 +173,17 @@ def sample(anchor_train):
 
     return ina, inb, cosine_target
 
-def calculate_inter_loss(zs, zt, anchor):
-    cosine_loss = nn.CosineEmbeddingLoss(margin=args.margin)
-    anchor_a = anchor[:, 0]
-    anchor_b = anchor[:, 1]
-    anchor_label = torch.ones(anchor.shape[0])  # 假设锚点链接对应的标签都是1（表示相似），可根据实际调整
-    anchor_label = anchor_label.to(zs.device)
-    return cosine_loss(zs[anchor_a], zt[anchor_b], anchor_label)
+def calculate_centrality_features(graph):
+    degree_centrality = nx.degree_centrality(graph)
+    closeness_centrality = nx.closeness_centrality(graph)
+    betweenness_centrality = nx.betweenness_centrality(graph)
+
+    features = np.zeros((graph.number_of_nodes(), 3))
+    for node in graph.nodes():
+        features[node, 0] = degree_centrality[node]
+        features[node, 1] = closeness_centrality[node]
+        features[node, 2] = betweenness_centrality[node]
+    return torch.FloatTensor(features)
 
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
@@ -229,7 +231,6 @@ if __name__ == "__main__":
         t_model = FedUA(t_x.shape[1], args.dim)
         globel_model = s_model
         global_model_state_dict = globel_model.state_dict()
-        global_optimizer = torch.optim.Adam(globel_model.parameters(), lr=args.lr)
 
         # Perform federated training
         print("Performing federated learning...\n")
@@ -239,19 +240,6 @@ if __name__ == "__main__":
             # Merge local model
             for key in global_model_state_dict.keys():
                 global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
-
-            # Update global model
-            globel_model.load_state_dict(global_model_state_dict)
-
-            for _ in range(args.epochs):
-                zs = globel_model.forward(s_x, s_e)
-                zt = globel_model.forward(t_x, t_e)
-                inter_loss = calculate_inter_loss(zs, zt, train_anchor)
-                global_optimizer.zero_grad()  # 梯度清零
-                inter_loss.backward()
-                global_optimizer.step()  # 使用优化器进行参数更新
-
-            global_model_state_dict = globel_model.state_dict()
             # Distribute globel model to local
             for key in s_state_dict.keys():
                 s_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + s_state_dict[key] * (1 - args.alpha)
