@@ -11,6 +11,7 @@ from time import time
 import argparse
 import os
 import networkx as nx
+from WGAN import Generator, Discriminator
 
 def parse_args():
     parser = argparse.ArgumentParser(description="CCNE")
@@ -86,11 +87,11 @@ def get_intra_loss(s_model, t_model):
 
 def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat, dim=64, lr=0.001, lamda=1, margin=0.8, neg=1, epochs=1000):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # add centrality features
-    s_c = calculate_centrality_features(g_s)
-    t_c = calculate_centrality_features(g_t)
-    s_x = torch.cat((s_x, s_c), 1)
-    t_x = torch.cat((t_x, t_c), 1)
+    # # add centrality features
+    # s_c = calculate_centrality_features(g_s)
+    # t_c = calculate_centrality_features(g_t)
+    # s_x = torch.cat((s_x, s_c), 1)
+    # t_x = torch.cat((t_x, t_c), 1)
     s_x = s_x.to(device)
     t_x = t_x.to(device)
     s_e = s_e.to(device)
@@ -98,13 +99,49 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
     s_model = s_model.to(device)
     t_model = t_model.to(device)
 
+    # 定义生成器和判别器
+    generator = Generator(s_x.shape[1], dim).to(device)
+    discriminator = Discriminator(dim, dim).to(device)
+
     s_optimizer = torch.optim.Adam(s_model.parameters(), lr=lr)
     t_optimizer = torch.optim.Adam(t_model.parameters(), lr=lr)
+    g_optimizer = torch.optim.Adam(generator.parameters(), lr=lr)
+    d_optimizer = torch.optim.Adam(discriminator.parameters(), lr=lr)
+
     cosine_loss=nn.CosineEmbeddingLoss(margin=margin)
     in_a, in_b, anchor_label = sample(anchor) # no hard negative sampling
 
     # print("Federated local learning...")
     for epoch in range(epochs):
+        # 训练判别器
+        for _ in range(5):  # 通常判别器需要多训练几次
+            d_optimizer.zero_grad()
+            zs = s_model.forward(s_x, s_e)
+            zt = t_model.forward(t_x, t_e)
+
+            # 生成假样本
+            fake_zs = generator(zs, s_e)
+            fake_zt = generator(zt, t_e)
+
+            # 计算判别器的损失
+            real_score = discriminator(zs, s_e).mean()
+            fake_score = discriminator(fake_zs, s_e).mean()
+            d_loss = -real_score + fake_score
+            d_loss.backward()
+            d_optimizer.step()
+
+            # 裁剪判别器的参数，保证Lipschitz连续性
+            for p in discriminator.parameters():
+                p.data.clamp_(-0.01, 0.01)
+
+        # 训练生成器
+        g_optimizer.zero_grad()
+        fake_zs = generator(zs, s_e)
+        fake_score = discriminator(fake_zs, s_e).mean()
+        g_loss = -fake_score
+        g_loss.backward()
+        g_optimizer.step()
+
         s_model.train()
         t_model.train()
         s_optimizer.zero_grad()
@@ -230,15 +267,15 @@ if __name__ == "__main__":
         t1 = time1 - start_time
         print('Finished in %.4f s!'%(t1))
 
-        # add centrality features
-        s_c = calculate_centrality_features(g_s)
-        t_c = calculate_centrality_features(g_t)
-        s_x_c = torch.cat((s_x, s_c), 1)
-        t_x_c = torch.cat((t_x, t_c), 1)
+        # # add centrality features
+        # s_c = calculate_centrality_features(g_s)
+        # t_c = calculate_centrality_features(g_t)
+        # s_x_c = torch.cat((s_x, s_c), 1)
+        # t_x_c = torch.cat((t_x, t_c), 1)
 
         # initial model
-        s_model = FedUA(s_x_c.shape[1], args.dim)
-        t_model = FedUA(t_x_c.shape[1], args.dim)
+        s_model = FedUA(s_x.shape[1], args.dim)
+        t_model = FedUA(t_x.shape[1], args.dim)
         globel_model = s_model
         global_model_state_dict = globel_model.state_dict()
 

@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from metrics import get_gt_matrix, get_statistics, top_k, compute_precision_k
 from utils import get_adj, get_edgeindex
-from model.node2vec import node2vec
+from model.node2vecLINE import node2vec
 import torch.nn as nn
 import torch_geometric
 from torch_geometric.nn import GCNConv
@@ -95,15 +95,16 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
 
     s_optimizer = torch.optim.Adam(s_model.parameters(), lr=lr)
     t_optimizer = torch.optim.Adam(t_model.parameters(), lr=lr)
+    cosine_loss=nn.CosineEmbeddingLoss(margin=margin)
+    in_a, in_b, anchor_label = sample(anchor, g_s, g_t, neg=neg) # no hard negative sampling
 
-    # 移除与inter_loss相关的采样操作，此处先注释掉，若后续有其他作用可适当调整保留部分逻辑
-    # in_a, in_b, anchor_label = sample(anchor) 
-
+    # print("Federated local learning...")
     for epoch in range(epochs):
         s_model.train()
         t_model.train()
         s_optimizer.zero_grad()
         t_optimizer.zero_grad()
+        # in_a, in_b, anchor_label = sample(anchor, g_s, g_t, neg=neg)
         zs = s_model.forward(s_x, s_e)
         zt = t_model.forward(t_x, t_e)
         
@@ -111,10 +112,18 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
         t_model.single_recon_loss(zt, t_e)
 
         intra_loss = s_model.intra_loss + t_model.intra_loss
-        intra_loss.backward()
+        anchor_label = anchor_label.view(-1).to(device)
+        inter_loss = cosine_loss(zs[in_a], zt[in_b], anchor_label)
+        loss = intra_loss + lamda * inter_loss
+        loss.backward()
         s_optimizer.step()
         t_optimizer.step()
-
+        # if epoch % 100 == 0:
+        #     p10 = evaluate(zs, zt, gt_mat)
+        #     print('Epoch: {:03d}, intra_loss: {:.8f}, inter_loss: {:.8f}, loss_train: {:.8f}, precision_10: {:.8f}'.format(epoch,\
+        #         intra_loss, inter_loss, loss, p10))
+    
+    # print("Federated local learning has been done...\n")
     s_model.eval()
     t_model.eval()
     s_embedding = s_model.forward(s_x, s_e)
@@ -122,18 +131,6 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
     s_embedding = s_embedding.detach().cpu()
     t_embedding = t_embedding.detach().cpu()
     return s_model.state_dict(), t_model.state_dict(), s_embedding, t_embedding
-    
-    # # 仅使用intra_loss进行训练
-    # for model, x, e in [(s_model, s_x, s_e), (t_model, t_x, t_e)]:
-    #     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    #     for epoch in range(epochs):
-    #         model.train()
-    #         optimizer.zero_grad()
-    #         z = model.forward(x, e)
-    #         model.single_recon_loss(z, e)
-    #         loss = model.intra_loss
-    #         loss.backward()
-    #         optimizer.step()
 
 @torch.no_grad()
 def evaluate(zs, zt, gt):
@@ -147,41 +144,54 @@ def evaluate(zs, zt, gt):
     precision_10 = compute_precision_k(pred_top_10, gt)
     return precision_10
 
-def sample(anchor_train):
+def sample(anchor_train, gs, gt, neg=1):
     '''
-    sample for each anchor without negative sampling
+    sample non-anchors for each anchor
     '''
+    triplet_neg = neg  # number of non-anchors for each anchor, when neg=1, there are two negtives for each anchor
+    anchor_flag = 1
     anchor_train_len = anchor_train.shape[0]
     anchor_train_a_list = np.array(anchor_train.T[0])
     anchor_train_b_list = np.array(anchor_train.T[1])
     input_a = []
     input_b = []
     classifier_target = torch.empty(0)
-    
-    for index in range(anchor_train_len):
+    np.random.seed(5)
+    index = 0
+    while index < anchor_train_len:
         a = anchor_train_a_list[index]
         b = anchor_train_b_list[index]
-        
         input_a.append(a)
         input_b.append(b)
-        an_target = torch.ones(1)  
+        an_target = torch.ones(anchor_flag)
         classifier_target = torch.cat((classifier_target, an_target), dim=0)
+        an_negs_index = list(set(gt.nodes()) - {b}) # all nodes except anchor node
+        # an_negs_index = list(gt.neighbors(b)) # neighbors of each anchor node
+        an_negs_index_sampled = list(np.random.choice(an_negs_index, triplet_neg, replace=True)) # randomly sample negatives
+        an_as = triplet_neg * [a]
+        input_a += an_as
+        input_b += an_negs_index_sampled
 
-    cosine_target = torch.unsqueeze(2 * classifier_target - 1, dim=1)  # labels are [1]
-    
+        an_negs_index1 = list(set(gs.nodes()) - {a})
+        # an_negs_index1 = list(gs.neighbors(a))
+        an_negs_index_sampled1 = list(np.random.choice(an_negs_index1, triplet_neg, replace=True))
+        an_as1 = triplet_neg * [b]
+        input_b += an_as1
+        input_a += an_negs_index_sampled1
+
+        un_an_target = torch.zeros(triplet_neg * 2)
+        classifier_target = torch.cat((classifier_target, un_an_target), dim=0)
+        index += 1
+
+    cosine_target = torch.unsqueeze(2 * classifier_target - 1, dim=1)  # labels are [1,-1,-1]
+    # classifier_target = torch.unsqueeze(classifier_target, dim=1)  # labels are [1,0,0]
+
     # [ina, inb] is all anchors and sampled non-anchors, cosine_target is their labels
     ina = torch.LongTensor(input_a)
     inb = torch.LongTensor(input_b)
 
     return ina, inb, cosine_target
 
-def calculate_inter_loss(zs, zt, anchor):
-    cosine_loss = nn.CosineEmbeddingLoss(margin=args.margin)
-    anchor_a = anchor[:, 0]
-    anchor_b = anchor[:, 1]
-    anchor_label = torch.ones(anchor.shape[0])  # 假设锚点链接对应的标签都是1（表示相似），可根据实际调整
-    anchor_label = anchor_label.to(zs.device)
-    return cosine_loss(zs[anchor_a], zt[anchor_b], anchor_label)
 
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
@@ -229,7 +239,6 @@ if __name__ == "__main__":
         t_model = FedUA(t_x.shape[1], args.dim)
         globel_model = s_model
         global_model_state_dict = globel_model.state_dict()
-        global_optimizer = torch.optim.Adam(globel_model.parameters(), lr=args.lr)
 
         # Perform federated training
         print("Performing federated learning...\n")
@@ -239,19 +248,6 @@ if __name__ == "__main__":
             # Merge local model
             for key in global_model_state_dict.keys():
                 global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
-
-            # Update global model
-            globel_model.load_state_dict(global_model_state_dict)
-
-            for _ in range(args.epochs):
-                zs = globel_model.forward(s_x, s_e)
-                zt = globel_model.forward(t_x, t_e)
-                inter_loss = calculate_inter_loss(zs, zt, train_anchor)
-                global_optimizer.zero_grad()  # 梯度清零
-                inter_loss.backward()
-                global_optimizer.step()  # 使用优化器进行参数更新
-
-            global_model_state_dict = globel_model.state_dict()
             # Distribute globel model to local
             for key in s_state_dict.keys():
                 s_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + s_state_dict[key] * (1 - args.alpha)

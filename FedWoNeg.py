@@ -172,17 +172,6 @@ def sample(anchor_train):
 
     return ina, inb, cosine_target
 
-def calculate_centrality_features(graph):
-    degree_centrality = nx.degree_centrality(graph)
-    closeness_centrality = nx.closeness_centrality(graph)
-    betweenness_centrality = nx.betweenness_centrality(graph)
-
-    features = np.zeros((graph.number_of_nodes(), 3))
-    for node in graph.nodes():
-        features[node, 0] = degree_centrality[node]
-        features[node, 1] = closeness_centrality[node]
-        features[node, 2] = betweenness_centrality[node]
-    return torch.FloatTensor(features)
 
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \

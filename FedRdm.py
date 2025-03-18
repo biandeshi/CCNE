@@ -192,17 +192,6 @@ def sample(anchor_train, gs, gt, neg=1):
 
     return ina, inb, cosine_target
 
-def calculate_centrality_features(graph):
-    degree_centrality = nx.degree_centrality(graph)
-    closeness_centrality = nx.closeness_centrality(graph)
-    betweenness_centrality = nx.betweenness_centrality(graph)
-
-    features = np.zeros((graph.number_of_nodes(), 3))
-    for node in graph.nodes():
-        features[node, 0] = degree_centrality[node]
-        features[node, 1] = closeness_centrality[node]
-        features[node, 2] = betweenness_centrality[node]
-    return torch.FloatTensor(features)
 
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
@@ -245,22 +234,16 @@ if __name__ == "__main__":
         t1 = time1 - start_time
         print('Finished in %.4f s!'%(t1))
 
-        # add centrality features
-        s_c = calculate_centrality_features(g_s)
-        t_c = calculate_centrality_features(g_t)
-        s_x_c = torch.cat((s_x, s_c), 1)
-        t_x_c = torch.cat((t_x, t_c), 1)
-
         # initial model
-        s_model = FedUA(s_x_c.shape[1], args.dim)
-        t_model = FedUA(t_x_c.shape[1], args.dim)
+        s_model = FedUA(s_x.shape[1], args.dim)
+        t_model = FedUA(t_x.shape[1], args.dim)
         globel_model = s_model
         global_model_state_dict = globel_model.state_dict()
 
         # Perform federated training
         print("Performing federated learning...\n")
         for round in range(args.rounds):
-            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x_c, t_x_c, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
+            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
                             args.lr, args.lamda, args.margin, args.neg, args.epochs)
             # Merge local model
             for key in global_model_state_dict.keys():
