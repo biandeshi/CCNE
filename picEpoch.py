@@ -225,7 +225,7 @@ if __name__ == "__main__":
     t1 = time1 - start_time
     print('Finished in %.4f s!'%(t1))
 
-    N = 1000
+    N = 500
     fig, axs = plt.subplots(1, 3, figsize=(16, 6))
     p1 = []
     p10 = []

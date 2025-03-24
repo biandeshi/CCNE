@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from metrics import get_gt_matrix, get_statistics, top_k, compute_precision_k
 from utils import get_adj, get_edgeindex
-from model.node2vecLINE import node2vec
+from model.node2vec import node2vec
 import torch.nn as nn
 import torch_geometric
 from torch_geometric.nn import GCNConv
@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument('--t_edge', default='./data/douban/offline/raw/edgelist')
     parser.add_argument('--dim', default=128, type=int)
     parser.add_argument('--lr', default=0.001, type=float)
-    parser.add_argument('--epochs', default=10, type=int)
+    parser.add_argument('--epochs', default=1000, type=int)
     parser.add_argument('--rounds', default=5, type=int)
     parser.add_argument('--lamda', default=1, type=float)
     parser.add_argument('--margin', default=0.9, type=float)
@@ -95,15 +95,15 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
 
     s_optimizer = torch.optim.Adam(s_model.parameters(), lr=lr)
     t_optimizer = torch.optim.Adam(t_model.parameters(), lr=lr)
-    cosine_loss=nn.CosineEmbeddingLoss(margin=margin)
-    in_a, in_b, anchor_label = sample(anchor, g_s, g_t, neg=neg) # no hard negative sampling
+    # cosine_loss=nn.CosineEmbeddingLoss(margin=margin)
+    # in_a, in_b, anchor_label = sample(anchor, g_s, g_t, neg=neg) # no hard negative sampling
+    s_optimizer.zero_grad()
+    t_optimizer.zero_grad()
 
     # print("Federated local learning...")
     for epoch in range(epochs):
         s_model.train()
         t_model.train()
-        s_optimizer.zero_grad()
-        t_optimizer.zero_grad()
         # in_a, in_b, anchor_label = sample(anchor, g_s, g_t, neg=neg)
         zs = s_model.forward(s_x, s_e)
         zt = t_model.forward(t_x, t_e)
@@ -112,12 +112,12 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
         t_model.single_recon_loss(zt, t_e)
 
         intra_loss = s_model.intra_loss + t_model.intra_loss
-        anchor_label = anchor_label.view(-1).to(device)
-        inter_loss = cosine_loss(zs[in_a], zt[in_b], anchor_label)
-        loss = intra_loss + lamda * inter_loss
-        loss.backward()
-        s_optimizer.step()
-        t_optimizer.step()
+        # anchor_label = anchor_label.view(-1).to(device)
+        # inter_loss = cosine_loss(zs[in_a], zt[in_b], anchor_label)
+        # loss = intra_loss + lamda * inter_loss
+        intra_loss.backward() #retain_graph=True)
+        # s_optimizer.step()
+        # t_optimizer.step()
         # if epoch % 100 == 0:
         #     p10 = evaluate(zs, zt, gt_mat)
         #     print('Epoch: {:03d}, intra_loss: {:.8f}, inter_loss: {:.8f}, loss_train: {:.8f}, precision_10: {:.8f}'.format(epoch,\
@@ -126,11 +126,9 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
     # print("Federated local learning has been done...\n")
     s_model.eval()
     t_model.eval()
-    s_embedding = s_model.forward(s_x, s_e)
-    t_embedding = t_model.forward(t_x, t_e)
-    s_embedding = s_embedding.detach().cpu()
-    t_embedding = t_embedding.detach().cpu()
-    return s_model.state_dict(), t_model.state_dict(), s_embedding, t_embedding
+    # s_embedding = s_model.forward(s_x, s_e)
+    # t_embedding = t_model.forward(t_x, t_e)
+    return s_model.state_dict(), t_model.state_dict(), zs.detach(), zt.detach()
 
 @torch.no_grad()
 def evaluate(zs, zt, gt):
@@ -237,26 +235,76 @@ if __name__ == "__main__":
         # initial model
         s_model = FedUA(s_x.shape[1], args.dim)
         t_model = FedUA(t_x.shape[1], args.dim)
-        globel_model = s_model
-        global_model_state_dict = globel_model.state_dict()
+        global_model = FedUA(s_x.shape[1], args.dim)
+        cosine_loss = nn.CosineEmbeddingLoss(margin=args.margin)
+        global_optimizer = torch.optim.Adam(global_model.parameters(), lr=args.lr)
+        global_model_state_dict = global_model.state_dict()
 
         # Perform federated training
         print("Performing federated learning...\n")
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
         for round in range(args.rounds):
             s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
                             args.lr, args.lamda, args.margin, args.neg, args.epochs)
-            # Merge local model
-            for key in global_model_state_dict.keys():
-                global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
-            # Distribute globel model to local
-            for key in s_state_dict.keys():
-                s_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + s_state_dict[key] * (1 - args.alpha)
-            for key in t_state_dict.keys():
-                t_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + t_state_dict[key] * (1 - args.alpha)
+            # 将嵌入张量关联到全局模型
+            # global_s_emb = global_model(s_x.to(device), s_e.to(device))
+            # global_t_emb = global_model(t_x.to(device), t_e.to(device))
+            
+            # Update global model
+            for _ in range(args.epochs):
+                s_model.load_state_dict(s_state_dict)
+                t_model.load_state_dict(t_state_dict)
+
+                with torch.no_grad():
+                    s_embedding = s_model(s_x.to(device), s_e.to(device))
+                    t_embedding = t_model(t_x.to(device), t_e.to(device))
+                
+                # 服务器计算inter_loss（使用全局模型的输出）
+                in_a, in_b, anchor_label = sample(train_anchor, g_s, g_t, 1)
+                anchor_label = anchor_label.view(-1).to(device)
+                inter_loss = cosine_loss(s_embedding[in_a], t_embedding[in_b], anchor_label)
+                
+                loss = inter_loss * args.lamda + (s_model.intra_loss + t_model.intra_loss)
+
+                global_optimizer.zero_grad()
+                loss.backward()
+
+                with torch.no_grad():
+                    for global_param, s_param, t_param in zip(global_model.parameters(), s_model.parameters(), t_model.parameters()):
+                        global_param.grad = (s_param.grad + t_param.grad) / 2
+        
+                # 执行参数更新
+                global_optimizer.step()
+                global_optimizer.zero_grad()
+
+            # # 全局模型反向传播
+            # global_optimizer.zero_grad()
+            # inter_loss.backward()
+            # global_optimizer.step()
+
+            # Update local models
+                s_model.load_state_dict(global_model.state_dict())
+                t_model.load_state_dict(global_model.state_dict())
+
+            # # Distribute globel model to local
+            # for key in s_state_dict.keys():
+            #     s_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + s_state_dict[key] * (1 - args.alpha)
+            # for key in t_state_dict.keys():
+            #     t_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + t_state_dict[key] * (1 - args.alpha)
+
+            p10 = evaluate(s_embedding, t_embedding, groundtruth_matrix)
+            print('round: {:03d}, intra_loss: {:.8f}, inter_loss: {:.8f}, precision_10: {:.8f}'.format(round,\
+                s_model.intra_loss + t_model.intra_loss, inter_loss, p10))
 
         print("Finished federated learning!\n")
-        S = cosine_similarity(s_embedding, t_embedding)  # Example evaluation logic
-        result = get_statistics(S, groundtruth_matrix)
+        with torch.no_grad():  # 禁用梯度计算
+            s_embedding = s_model(s_x.to(device), s_e.to(device))
+            t_embedding = t_model(t_x.to(device), t_e.to(device))
+            s_emb_np = s_embedding.detach().cpu().numpy()
+            t_emb_np = t_embedding.detach().cpu().numpy()
+            S = cosine_similarity(s_emb_np, t_emb_np)
+            result = get_statistics(S, groundtruth_matrix)
         t3 = time() - start_time
         for k, v in result.items():
             # print(f'{k}: {v:.4f}')

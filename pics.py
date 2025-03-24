@@ -3,9 +3,10 @@ import re
 import matplotlib.pyplot as plt
 
 datasets = ['douban', 'twitter1_youtube', 'twitter_foursquare']
+results = {}
+train_file = 'FedRdm'
 
 def extract_results(file_path):
-    results = {}
     with open(file_path, 'r') as file:
         content = file.read()
 
@@ -13,8 +14,33 @@ def extract_results(file_path):
         results['Acc'] = float(re.search(r'Acc: ([\d.]+)', content).group(1))
         results['AUC'] = float(re.search(r'AUC: ([\d.]+)', content).group(1))
         results['Precision@1'] = float(re.search(r'Precision@1: ([\d.]+)', content).group(1))
+        results['Precision@5'] = float(re.search(r'Precision@5: ([\d.]+)', content).group(1))
         results['Precision@10'] = float(re.search(r'Precision@10: ([\d.]+)', content).group(1))
+        results['Precision@20'] = float(re.search(r'Precision@20: ([\d.]+)', content).group(1))
+        results['Precision@30'] = float(re.search(r'Precision@30: ([\d.]+)', content).group(1))
+        results['Precision@40'] = float(re.search(r'Precision@40: ([\d.]+)', content).group(1))
+        results['Precision@50'] = float(re.search(r'Precision@50: ([\d.]+)', content).group(1))
+        results['Precision@60'] = float(re.search(r'Precision@60: ([\d.]+)', content).group(1))
+        results['Precision@70'] = float(re.search(r'Precision@70: ([\d.]+)', content).group(1))
+        results['Precision@80'] = float(re.search(r'Precision@80: ([\d.]+)', content).group(1))
+        results['Precision@90'] = float(re.search(r'Precision@90: ([\d.]+)', content).group(1))
+        results['Precision@100'] = float(re.search(r'Precision@100: ([\d.]+)', content).group(1))
     return results
+
+def plot_p1_2_p100():
+    fig, axs = plt.subplots(1, 1, figsize=(10, 10))
+
+    p_values = [results['Precision@1'], results['Precision@5']]
+    p_values.append([results[f'Precision@{i * 10}'] for i in range(1, 11)])
+
+    axs.plot([1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], p_values, marker='o', label='Precision@K')
+    axs.set_xlabel('K')
+    axs.set_ylabel('Precision@K')
+    axs.set_title('Precision@K vs K')
+    axs.grid(True)
+
+    plt.tight_layout()
+    plt.savefig('pics/ratio_mrr_p10.png')
 
 def plot_ratio_mmr_p10():
     fig, axs = plt.subplots(2, len(datasets), figsize=(16, 10))
@@ -25,7 +51,7 @@ def plot_ratio_mmr_p10():
         p10s = []
         output_dir = f'output/{datasets[i]}'
         for train_ratio in [x / 10.0 for x in range(1, 10)]:
-            file_name = f'FedWoNeg_tr={train_ratio}.txt'
+            file_name = f'{train_file}_tr={train_ratio}.txt'
             file_path = os.path.join(output_dir, file_name)
 
             if os.path.exists(file_path):
