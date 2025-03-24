@@ -1,0 +1,28 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 30.0646 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 119
+Total test nodes: 336
+Total runtime: 60.6972 s
+
+CCNE with Federated Learning
+Namespace(alpha=1.0, dim=128, epochs=200, gt_path='data/douban/anchor/node,split=0.7.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/douban/embeddings', rounds=5, s_edge='data/douban/online/raw/edgelist', t_edge='data/douban/offline/raw/edgelist', train_path='data/douban/anchor/node,split=0.7.train.dict')
+Average results:
+Acc: 0.3542
+MRR: 0.5504
+AUC: 0.9956
+Hit: 0.9956
+Precision@1: 0.3869
+Precision@5: 0.7798
+Precision@10: 0.8839
+Precision@15: 0.9167
+Precision@20: 0.9345
+Precision@25: 0.9524
+Precision@30: 0.9613
+time: 60.6972

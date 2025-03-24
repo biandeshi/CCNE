@@ -1,0 +1,76 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 148.3549 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 63
+Total test nodes: 1288
+Total runtime: 513.7618 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 146.7724 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 55
+Total test nodes: 1288
+Total runtime: 507.8846 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 146.6683 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 59
+Total test nodes: 1288
+Total runtime: 509.2036 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 144.4180 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 55
+Total test nodes: 1288
+Total runtime: 505.0408 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 145.5275 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 67
+Total test nodes: 1288
+Total runtime: 509.0715 s
+
+CCNE with Federated Learning
+Namespace(alpha=1.0, dim=128, epochs=200, gt_path='data/twitter_foursquare/anchor/node,split=0.2.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/twitter_foursquare/embeddings', rounds=5, s_edge='data/twitter_foursquare/twitter/raw/edgelist', t_edge='data/twitter_foursquare/foursquare/raw/edgelist', train_path='data/twitter_foursquare/anchor/node,split=0.2.train.dict')
+Average results:
+Acc: 0.0464
+MRR: 0.0885
+AUC: 0.8850
+Hit: 0.8850
+Precision@1: 0.0390
+Precision@5: 0.1255
+Precision@10: 0.1901
+Precision@15: 0.2345
+Precision@20: 0.2685
+Precision@25: 0.2953
+Precision@30: 0.3172
+time: 508.9924

@@ -176,7 +176,7 @@ def sample(anchor_train):
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
         'Precision@20', 'Precision@25', 'Precision@30', 'time'), 0) # save results
-    N = 5 # repeat times for average, default: 1
+    N = 1 # repeat times for average, default: 1
     for i in range(N):
         start_time = time()
         args = parse_args()

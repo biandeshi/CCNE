@@ -210,6 +210,7 @@ if __name__ == "__main__":
         t_e = get_edgeindex(args.t_edge)
         s_num = s_adj.shape[0]
         t_num = t_adj.shape[0]
+        total_num = s_num+ t_num
         # load train anchor links
         train_anchor = torch.LongTensor(np.loadtxt(args.train_path, dtype=int))
         # generate test anchor matrix for evaluation
@@ -247,7 +248,7 @@ if __name__ == "__main__":
                             args.lr, args.lamda, args.margin, args.neg, args.epochs)
             # Merge local model
             for key in global_model_state_dict.keys():
-                global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
+                global_model_state_dict[key] = s_state_dict[key] * s_num /total_num + t_state_dict[key] * t_num /total_num 
             # Distribute globel model to local
             for key in s_state_dict.keys():
                 s_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + s_state_dict[key] * (1 - args.alpha)

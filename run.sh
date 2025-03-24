@@ -6,7 +6,7 @@ PREFIX2S=(offline foursquare youtube)
 EPOCHS=200
 ALPHA=1.0
 LR=0.001
-RUNFILE=FedRdm
+RUNFILE=FedWoNeg
 
 mkdir output/${DATASETS[0]}
 mkdir output/${DATASETS[1]}

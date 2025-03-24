@@ -184,15 +184,15 @@ def sample(anchor_train, gs, gt, neg=1):
         input_b.append(b)
         an_target = torch.ones(anchor_flag)
         classifier_target = torch.cat((classifier_target, an_target), dim=0)
-        # an_negs_index = list(set(node_t) - {b}) # all nodes except anchor node
-        an_negs_index = list(gt.neighbors(b)) # neighbors of each anchor node
+        an_negs_index = list(set(gt.nodes()) - {b}) # all nodes except anchor node
+        # an_negs_index = list(gt.neighbors(b)) # neighbors of each anchor node
         an_negs_index_sampled = list(np.random.choice(an_negs_index, triplet_neg, replace=True)) # randomly sample negatives
         an_as = triplet_neg * [a]
         input_a += an_as
         input_b += an_negs_index_sampled
 
-        # an_negs_index1 = list(set(node_f) - {a})
-        an_negs_index1 = list(gs.neighbors(a))
+        an_negs_index1 = list(set(gs.nodes()) - {a})
+        # an_negs_index1 = list(gs.neighbors(a))
         an_negs_index_sampled1 = list(np.random.choice(an_negs_index1, triplet_neg, replace=True))
         an_as1 = triplet_neg * [b]
         input_b += an_as1

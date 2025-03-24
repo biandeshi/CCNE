@@ -1,0 +1,48 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 31.7739 s!
+Generate embeddings...
+Epoch: 000, intra_loss: 4.26683426, inter_loss: 0.21294910, loss_train: 4.47978354, precision_10: 0.01021711
+Epoch: 100, intra_loss: 1.55916774, inter_loss: 0.11281287, loss_train: 1.67198062, precision_10: 0.58237548
+Epoch: 200, intra_loss: 1.53198361, inter_loss: 0.07066020, loss_train: 1.60264385, precision_10: 0.68837803
+Epoch: 300, intra_loss: 1.51768887, inter_loss: 0.05335921, loss_train: 1.57104814, precision_10: 0.72669221
+Epoch: 400, intra_loss: 1.50197196, inter_loss: 0.04319872, loss_train: 1.54517066, precision_10: 0.74457216
+Epoch: 500, intra_loss: 1.50644922, inter_loss: 0.03666754, loss_train: 1.54311681, precision_10: 0.75989783
+Epoch: 600, intra_loss: 1.49176407, inter_loss: 0.03208037, loss_train: 1.52384448, precision_10: 0.75989783
+Epoch: 700, intra_loss: 1.49748921, inter_loss: 0.02884188, loss_train: 1.52633107, precision_10: 0.76500639
+Epoch: 800, intra_loss: 1.48099470, inter_loss: 0.02624547, loss_train: 1.50724018, precision_10: 0.77650064
+Epoch: 900, intra_loss: 1.47445464, inter_loss: 0.02407504, loss_train: 1.49852967, precision_10: 0.77394636
+Finished in 31.6298 s!
+Evaluating...
+True matched nodes: 237
+Total test nodes: 783
+Acc: 0.3027
+MRR: 0.4666
+AUC: 0.9834
+Hit: 0.9834
+Precision@1: 0.3180
+Precision@5: 0.6501
+Precision@10: 0.7752
+Precision@15: 0.8212
+Precision@20: 0.8493
+Precision@25: 0.8659
+Precision@30: 0.8812
+Total runtime: 66.2436 s
+
+CCNE
+Namespace(dim=128, epochs=1000, gt_path='data/douban/anchor/node,split=0.3.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/douban/embeddings', s_edge='data/douban/online/raw/edgelist', t_edge='data/douban/offline/raw/edgelist', train_path='data/douban/anchor/node,split=0.3.train.dict')
+Average results:
+Acc: 0.3027
+MRR: 0.4666
+AUC: 0.9834
+Hit: 0.9834
+Precision@1: 0.3180
+Precision@5: 0.6501
+Precision@10: 0.7752
+Precision@15: 0.8212
+Precision@20: 0.8493
+Precision@25: 0.8659
+Precision@30: 0.8812
+time: 66.2436

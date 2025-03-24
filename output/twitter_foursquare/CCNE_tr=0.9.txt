@@ -1,0 +1,48 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 154.5120 s!
+Generate embeddings...
+Epoch: 000, intra_loss: 2.56855226, inter_loss: 0.23826079, loss_train: 2.80681300, precision_10: 0.00621118
+Epoch: 100, intra_loss: 1.84974933, inter_loss: 0.10432895, loss_train: 1.95407832, precision_10: 0.11801242
+Epoch: 200, intra_loss: 1.80449843, inter_loss: 0.09372083, loss_train: 1.89821923, precision_10: 0.20496894
+Epoch: 300, intra_loss: 1.78078437, inter_loss: 0.08918493, loss_train: 1.86996925, precision_10: 0.23602484
+Epoch: 400, intra_loss: 1.76717877, inter_loss: 0.08656225, loss_train: 1.85374105, precision_10: 0.24844720
+Epoch: 500, intra_loss: 1.75702262, inter_loss: 0.08423915, loss_train: 1.84126174, precision_10: 0.25465839
+Epoch: 600, intra_loss: 1.74826670, inter_loss: 0.08230043, loss_train: 1.83056712, precision_10: 0.26708075
+Epoch: 700, intra_loss: 1.73945630, inter_loss: 0.08113437, loss_train: 1.82059062, precision_10: 0.27950311
+Epoch: 800, intra_loss: 1.73476112, inter_loss: 0.07978551, loss_train: 1.81454659, precision_10: 0.30434783
+Epoch: 900, intra_loss: 1.72846687, inter_loss: 0.07883365, loss_train: 1.80730057, precision_10: 0.29192547
+Finished in 350.7478 s!
+Evaluating...
+True matched nodes: 14
+Total test nodes: 161
+Acc: 0.0870
+MRR: 0.1472
+AUC: 0.9414
+Hit: 0.9414
+Precision@1: 0.0745
+Precision@5: 0.2112
+Precision@10: 0.2919
+Precision@15: 0.3665
+Precision@20: 0.4037
+Precision@25: 0.4472
+Precision@30: 0.4907
+Total runtime: 549.9476 s
+
+CCNE
+Namespace(dim=128, epochs=1000, gt_path='data/twitter_foursquare/anchor/node,split=0.9.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/twitter_foursquare/embeddings', s_edge='data/twitter_foursquare/twitter/raw/edgelist', t_edge='data/twitter_foursquare/foursquare/raw/edgelist', train_path='data/twitter_foursquare/anchor/node,split=0.9.train.dict')
+Average results:
+Acc: 0.0870
+MRR: 0.1472
+AUC: 0.9414
+Hit: 0.9414
+Precision@1: 0.0745
+Precision@5: 0.2112
+Precision@10: 0.2919
+Precision@15: 0.3665
+Precision@20: 0.4037
+Precision@25: 0.4472
+Precision@30: 0.4907
+time: 549.9476
