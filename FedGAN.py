@@ -11,7 +11,6 @@ from time import time
 import argparse
 import os
 import networkx as nx
-from WGAN import Generator, Discriminator
 
 def parse_args():
     parser = argparse.ArgumentParser(description="CCNE")
@@ -30,6 +29,22 @@ def parse_args():
     # Percentage of the globel model
     parser.add_argument('--alpha', default=1.0, type=float)
     return parser.parse_args()
+
+class Critic(nn.Module):
+    def __init__(self, embed_dim):
+        super().__init__()
+        self.fc = nn.Sequential(
+            nn.Linear(embed_dim, 256),
+            nn.LeakyReLU(0.2),
+            nn.LayerNorm(256),
+            nn.Linear(256, 128),
+            nn.LeakyReLU(0.2),
+            nn.LayerNorm(128),
+            nn.Linear(128, 1)
+        )
+    
+    def forward(self, z):
+        return self.fc(z).squeeze(-1)
 
 class FedUA(torch.nn.Module):
     def __init__(self, input, output):#, not_share=False, is_bn=False, dropout=0):
@@ -87,11 +102,11 @@ def get_intra_loss(s_model, t_model):
 
 def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat, dim=64, lr=0.001, lamda=1, margin=0.8, neg=1, epochs=1000):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # # add centrality features
-    # s_c = calculate_centrality_features(g_s)
-    # t_c = calculate_centrality_features(g_t)
-    # s_x = torch.cat((s_x, s_c), 1)
-    # t_x = torch.cat((t_x, t_c), 1)
+    # 初始化Critic
+    critic = Critic(dim).to(device)
+    opt_c = torch.optim.Adam(critic.parameters(), lr=lr, betas=(0.5, 0.999))
+    lambda_gp = 10  # 梯度惩罚系数
+
     s_x = s_x.to(device)
     t_x = t_x.to(device)
     s_e = s_e.to(device)
@@ -99,48 +114,44 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
     s_model = s_model.to(device)
     t_model = t_model.to(device)
 
-    # 定义生成器和判别器
-    generator = Generator(s_x.shape[1], dim).to(device)
-    discriminator = Discriminator(dim, dim).to(device)
-
     s_optimizer = torch.optim.Adam(s_model.parameters(), lr=lr)
     t_optimizer = torch.optim.Adam(t_model.parameters(), lr=lr)
-    g_optimizer = torch.optim.Adam(generator.parameters(), lr=lr)
-    d_optimizer = torch.optim.Adam(discriminator.parameters(), lr=lr)
-
     cosine_loss=nn.CosineEmbeddingLoss(margin=margin)
     in_a, in_b, anchor_label = sample(anchor) # no hard negative sampling
 
     # print("Federated local learning...")
     for epoch in range(epochs):
-        # 训练判别器
-        for _ in range(5):  # 通常判别器需要多训练几次
-            d_optimizer.zero_grad()
-            zs = s_model.forward(s_x, s_e)
-            zt = t_model.forward(t_x, t_e)
-
-            # 生成假样本
-            fake_zs = generator(zs, s_e)
-            fake_zt = generator(zt, t_e)
-
-            # 计算判别器的损失
-            real_score = discriminator(zs, s_e).mean()
-            fake_score = discriminator(fake_zs, s_e).mean()
-            d_loss = -real_score + fake_score
-            d_loss.backward()
-            d_optimizer.step()
-
-            # 裁剪判别器的参数，保证Lipschitz连续性
-            for p in discriminator.parameters():
-                p.data.clamp_(-0.01, 0.01)
-
-        # 训练生成器
-        g_optimizer.zero_grad()
-        fake_zs = generator(zs, s_e)
-        fake_score = discriminator(fake_zs, s_e).mean()
-        g_loss = -fake_score
-        g_loss.backward()
-        g_optimizer.step()
+        # 训练Critic 5次
+        for _ in range(5):
+            # 生成嵌入
+            with torch.no_grad():
+                zs = s_model(s_x, s_e)
+                zt = t_model(t_x, t_e)
+            
+            # WGAN-GP训练
+            real_samples = torch.randn_like(zs).to(device)
+            
+            # 计算Critic分数
+            real_scores = critic(real_samples)
+            fake_scores = critic(zs.detach())
+            
+            # 梯度惩罚
+            alpha = torch.rand(zs.size(0), 1).to(device)
+            interpolates = (alpha * real_samples + (1 - alpha) * zs.detach()).requires_grad_(True)
+            crit_interpolates = critic(interpolates)
+            gradients = torch.autograd.grad(
+                outputs=crit_interpolates,
+                inputs=interpolates,
+                grad_outputs=torch.ones_like(crit_interpolates),
+                create_graph=True,
+            )[0]
+            grad_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean()
+            
+            # Critic损失
+            loss_c = -(torch.mean(real_scores) - torch.mean(fake_scores)) + lambda_gp * grad_penalty
+            opt_c.zero_grad()
+            loss_c.backward()
+            opt_c.step()
 
         s_model.train()
         t_model.train()
@@ -156,7 +167,12 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
         intra_loss = s_model.intra_loss + t_model.intra_loss
         anchor_label = anchor_label.view(-1).to(device)
         inter_loss = cosine_loss(zs[in_a], zt[in_b], anchor_label)
-        loss = intra_loss + lamda * inter_loss
+
+        # 对抗损失
+        fake_scores = critic(zs)
+        loss_adv = -torch.mean(fake_scores)
+
+        loss = intra_loss + lamda * inter_loss + 0.1 * loss_adv
         loss.backward()
         s_optimizer.step()
         t_optimizer.step()
@@ -214,22 +230,11 @@ def sample(anchor_train):
 
     return ina, inb, cosine_target
 
-def calculate_centrality_features(graph):
-    degree_centrality = nx.degree_centrality(graph)
-    closeness_centrality = nx.closeness_centrality(graph)
-    betweenness_centrality = nx.betweenness_centrality(graph)
-
-    features = np.zeros((graph.number_of_nodes(), 3))
-    for node in graph.nodes():
-        features[node, 0] = degree_centrality[node]
-        features[node, 1] = closeness_centrality[node]
-        features[node, 2] = betweenness_centrality[node]
-    return torch.FloatTensor(features)
 
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
         'Precision@20', 'Precision@25', 'Precision@30', 'time'), 0) # save results
-    N = 5 # repeat times for average, default: 1
+    N = 1 # repeat times for average, default: 1
     for i in range(N):
         start_time = time()
         args = parse_args()
@@ -267,12 +272,6 @@ if __name__ == "__main__":
         t1 = time1 - start_time
         print('Finished in %.4f s!'%(t1))
 
-        # # add centrality features
-        # s_c = calculate_centrality_features(g_s)
-        # t_c = calculate_centrality_features(g_t)
-        # s_x_c = torch.cat((s_x, s_c), 1)
-        # t_x_c = torch.cat((t_x, t_c), 1)
-
         # initial model
         s_model = FedUA(s_x.shape[1], args.dim)
         t_model = FedUA(t_x.shape[1], args.dim)
@@ -298,7 +297,7 @@ if __name__ == "__main__":
         result = get_statistics(S, groundtruth_matrix)
         t3 = time() - start_time
         for k, v in result.items():
-            print(f'{k}: {v:.4f}')
+            # print(f'{k}: {v:.4f}')
             results[k] += v
 
         results['time'] += t3

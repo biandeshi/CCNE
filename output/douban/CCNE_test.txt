@@ -1,0 +1,48 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 39.4013 s!
+Generate embeddings...
+Epoch: 000, intra_loss: 5.32112265, inter_loss: 0.19464061, loss_train: 5.51576328, precision_10: 0.00397219
+Epoch: 100, intra_loss: 1.55992889, inter_loss: 0.07222852, loss_train: 1.63215744, precision_10: 0.40019861
+Epoch: 200, intra_loss: 1.54228878, inter_loss: 0.03369263, loss_train: 1.57598138, precision_10: 0.44488580
+Epoch: 300, intra_loss: 1.50995374, inter_loss: 0.02114015, loss_train: 1.53109384, precision_10: 0.45481629
+Epoch: 400, intra_loss: 1.50868440, inter_loss: 0.01514190, loss_train: 1.52382624, precision_10: 0.46971202
+Epoch: 500, intra_loss: 1.49203467, inter_loss: 0.01184928, loss_train: 1.50388396, precision_10: 0.48162860
+Epoch: 600, intra_loss: 1.48867059, inter_loss: 0.00963646, loss_train: 1.49830699, precision_10: 0.47368421
+Epoch: 700, intra_loss: 1.48874426, inter_loss: 0.00829946, loss_train: 1.49704373, precision_10: 0.47666336
+Epoch: 800, intra_loss: 1.47442913, inter_loss: 0.00720145, loss_train: 1.48163056, precision_10: 0.48063555
+Epoch: 900, intra_loss: 1.47899795, inter_loss: 0.00650054, loss_train: 1.48549843, precision_10: 0.48262165
+Finished in 214.1395 s!
+Evaluating...
+True matched nodes: 160
+Total test nodes: 1007
+Acc: 0.1589
+MRR: 0.2562
+AUC: 0.9009
+Hit: 0.9010
+Precision@1: 0.1480
+Precision@5: 0.3674
+Precision@10: 0.4816
+Precision@15: 0.5432
+Precision@20: 0.5869
+Precision@25: 0.6177
+Precision@30: 0.6375
+Total runtime: 256.0869 s
+
+CCNE
+Namespace(dim=128, epochs=1000, gt_path='data/douban/anchor/node,split=0.1.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/douban/embeddings', s_edge='data/douban/online/raw/edgelist', t_edge='data/douban/offline/raw/edgelist', train_path='data/douban/anchor/node,split=0.1.train.dict')
+Average results:
+Acc: 0.1589
+MRR: 0.2562
+AUC: 0.9009
+Hit: 0.9010
+Precision@1: 0.1480
+Precision@5: 0.3674
+Precision@10: 0.4816
+Precision@15: 0.5432
+Precision@20: 0.5869
+Precision@25: 0.6177
+Precision@30: 0.6375
+time: 256.0869
