@@ -2,7 +2,8 @@ import os
 import re
 import matplotlib.pyplot as plt
 
-train_file = ['FedWoNeg', 'CCNE']
+train_file = ['FedGAN', 'FedWoNeg', 'CCNE']
+makers = ['.', 'x', 's']
 
 def extract_results(file_path):
     results = {}
@@ -24,17 +25,13 @@ def extract_results(file_path):
 def plot_pK():
     fig, axs = plt.subplots(1, 1, figsize=(5, 5))
 
-    file1 = 'output/douban/' + train_file[0] + '_tr=0.8.txt'
-    file2 = 'output/douban/' + train_file[1] + '_tr=0.8.txt'
+    for i in range(3):
+        file = 'output/douban/' + train_file[i] + '_tr=0.8.txt'
+        results = extract_results(file)
+        p_values = [results[f'Precision@{k}'] for k in [1, 5, 10, 15, 20, 25, 30]]
 
-    results1 = extract_results(file1)
-    results2 = extract_results(file2)
 
-    p_values1 = [results1[f'Precision@{k}'] for k in [1, 5, 10, 15, 20, 25, 30]]
-    p_values2 = [results2[f'Precision@{k}'] for k in [1, 5, 10, 15, 20, 25, 30]]
-
-    axs.plot([1, 5, 10, 15, 20, 25, 30], p_values1, marker='o', label='FedWoNeg')
-    axs.plot([1, 5, 10, 15, 20, 25, 30], p_values2, marker='o', label='CCNE')
+        axs.plot([1, 5, 10, 15, 20, 25, 30], p_values, marker=makers[i], label=train_file[i])
     axs.set_xlabel('K')
     axs.set_ylabel('Precision@K')
     axs.grid(True)
@@ -47,7 +44,8 @@ def plot_ratio_mmr_pk():
     fig, axs = plt.subplots(1, 2, figsize=(10, 5))
 
     output_dir = f'output/douban'
-    for file in train_file:
+    for i in range(3):
+        file = train_file[i]
         mrrs = []
         pk = []
         train_ratios = []
@@ -59,18 +57,18 @@ def plot_ratio_mmr_pk():
                 results = extract_results(file_path)
                 train_ratios.append(train_ratio)
                 mrrs.append(results['MRR'])
-                pk.append(results['Precision@1'])
+                pk.append(results['Precision@10'])
             else:
                 print(f"Warning: {file_path} not found.")
 
-        axs[0].plot(train_ratios, mrrs, marker='o', label=file)
+        axs[0].plot(train_ratios, mrrs, marker=makers[i], label=file)
         axs[0].set_xlabel('Train Ratio')
         axs[0].set_ylabel('MRR')
         axs[0].grid(True)
 
-        axs[1].plot(train_ratios, pk, marker='o', label=file)
+        axs[1].plot(train_ratios, pk, marker=makers[i], label=file)
         axs[1].set_xlabel('Train Ratio')
-        axs[1].set_ylabel('Precision@1')
+        axs[1].set_ylabel('Precision@10')
         axs[1].grid(True)
 
     plt.legend()

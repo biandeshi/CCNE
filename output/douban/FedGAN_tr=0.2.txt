@@ -1,0 +1,76 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 31.1515 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 223
+Total test nodes: 895
+Total runtime: 104.4647 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 29.9079 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 201
+Total test nodes: 895
+Total runtime: 96.1108 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 29.6274 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 226
+Total test nodes: 895
+Total runtime: 99.5270 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 29.5675 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 227
+Total test nodes: 895
+Total runtime: 96.5999 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 30.7855 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 227
+Total test nodes: 895
+Total runtime: 100.2923 s
+
+CCNE with Federated Learning
+Namespace(alpha=1.0, dim=128, epochs=200, gt_path='data/douban/anchor/node,split=0.2.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/douban/embeddings', rounds=5, s_edge='data/douban/online/raw/edgelist', t_edge='data/douban/offline/raw/edgelist', train_path='data/douban/anchor/node,split=0.2.train.dict')
+Average results:
+Acc: 0.2467
+MRR: 0.3656
+AUC: 0.9607
+Hit: 0.9607
+Precision@1: 0.2125
+Precision@5: 0.5542
+Precision@10: 0.6825
+Precision@15: 0.7428
+Precision@20: 0.7799
+Precision@25: 0.8027
+Precision@30: 0.8197
+time: 99.3989
