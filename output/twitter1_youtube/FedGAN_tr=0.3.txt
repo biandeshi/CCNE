@@ -1,0 +1,76 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 70.5288 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 105
+Total test nodes: 2140
+Total runtime: 201.6266 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 68.9854 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 110
+Total test nodes: 2140
+Total runtime: 198.3098 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 68.8747 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 101
+Total test nodes: 2140
+Total runtime: 198.4678 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 69.7411 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 102
+Total test nodes: 2140
+Total runtime: 201.0087 s
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 69.2469 s!
+Performing federated learning...
+
+Finished federated learning!
+
+True matched nodes: 114
+Total test nodes: 2140
+Total runtime: 191.5067 s
+
+CCNE with Federated Learning
+Namespace(alpha=1.0, dim=128, epochs=200, gt_path='data/twitter1_youtube/anchor/node,split=0.3.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/twitter1_youtube/embeddings', rounds=5, s_edge='data/twitter1_youtube/twitter1/raw/edgelist', t_edge='data/twitter1_youtube/youtube/raw/edgelist', train_path='data/twitter1_youtube/anchor/node,split=0.3.train.dict')
+Average results:
+Acc: 0.0497
+MRR: 0.0766
+AUC: 0.8193
+Hit: 0.8194
+Precision@1: 0.0286
+Precision@5: 0.1177
+Precision@10: 0.1746
+Precision@15: 0.2130
+Precision@20: 0.2388
+Precision@25: 0.2581
+Precision@30: 0.2751
+time: 198.1839
