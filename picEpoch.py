@@ -31,6 +31,22 @@ def parse_args():
     parser.add_argument('--alpha', default=1.0, type=float)
     return parser.parse_args()
 
+class Critic(nn.Module):
+    def __init__(self, embed_dim):
+        super().__init__()
+        self.fc = nn.Sequential(
+            nn.Linear(embed_dim, 256),
+            nn.LeakyReLU(0.2),
+            nn.LayerNorm(256),
+            nn.Linear(256, 128),
+            nn.LeakyReLU(0.2),
+            nn.LayerNorm(128),
+            nn.Linear(128, 1)
+        )
+    
+    def forward(self, z):
+        return self.fc(z).squeeze(-1)
+
 class FedUA(torch.nn.Module):
     def __init__(self, input, output):#, not_share=False, is_bn=False, dropout=0):
         super().__init__()
@@ -87,6 +103,11 @@ def get_intra_loss(s_model, t_model):
 
 def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat, dim=64, lr=0.001, lamda=1, margin=0.8, neg=1, epochs=1000):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # 初始化Critic
+    critic = Critic(dim).to(device)
+    opt_c = torch.optim.Adam(critic.parameters(), lr=lr, betas=(0.5, 0.999))
+    lambda_gp = 10  # 梯度惩罚系数
+
     s_x = s_x.to(device)
     t_x = t_x.to(device)
     s_e = s_e.to(device)
@@ -101,6 +122,38 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
 
     # print("Federated local learning...")
     for epoch in range(epochs):
+        # 训练Critic 5次
+        for _ in range(5):
+            # 生成嵌入
+            with torch.no_grad():
+                zs = s_model(s_x, s_e)
+                zt = t_model(t_x, t_e)
+            
+            # WGAN-GP训练
+            real_samples = torch.randn_like(zs).to(device)
+            
+            # 计算Critic分数
+            real_scores = critic(real_samples)
+            fake_scores = critic(zs.detach())
+            
+            # 梯度惩罚
+            alpha = torch.rand(zs.size(0), 1).to(device)
+            interpolates = (alpha * real_samples + (1 - alpha) * zs.detach()).requires_grad_(True)
+            crit_interpolates = critic(interpolates)
+            gradients = torch.autograd.grad(
+                outputs=crit_interpolates,
+                inputs=interpolates,
+                grad_outputs=torch.ones_like(crit_interpolates),
+                create_graph=True,
+            )[0]
+            grad_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean()
+            
+            # Critic损失
+            loss_c = -(torch.mean(real_scores) - torch.mean(fake_scores)) + lambda_gp * grad_penalty
+            opt_c.zero_grad()
+            loss_c.backward()
+            opt_c.step()
+
         s_model.train()
         t_model.train()
         s_optimizer.zero_grad()
@@ -115,7 +168,12 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
         intra_loss = s_model.intra_loss + t_model.intra_loss
         anchor_label = anchor_label.view(-1).to(device)
         inter_loss = cosine_loss(zs[in_a], zt[in_b], anchor_label)
-        loss = intra_loss + lamda * inter_loss
+
+        # 对抗损失
+        fake_scores = critic(zs)
+        loss_adv = -torch.mean(fake_scores)
+
+        loss = intra_loss + lamda * inter_loss + 0.1 * loss_adv
         loss.backward()
         s_optimizer.step()
         t_optimizer.step()
@@ -173,17 +231,6 @@ def sample(anchor_train):
 
     return ina, inb, cosine_target
 
-def calculate_centrality_features(graph):
-    degree_centrality = nx.degree_centrality(graph)
-    closeness_centrality = nx.closeness_centrality(graph)
-    betweenness_centrality = nx.betweenness_centrality(graph)
-
-    features = np.zeros((graph.number_of_nodes(), 3))
-    for node in graph.nodes():
-        features[node, 0] = degree_centrality[node]
-        features[node, 1] = closeness_centrality[node]
-        features[node, 2] = betweenness_centrality[node]
-    return torch.FloatTensor(features)
 
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
@@ -226,12 +273,11 @@ if __name__ == "__main__":
     print('Finished in %.4f s!'%(t1))
 
     N = 500
-    fig, axs = plt.subplots(1, 3, figsize=(16, 6))
-    p1 = []
+    fig, axs = plt.subplots(1, 2, figsize=(10, 6))
     p10 = []
     mrr = []
-    epochs = []
-    for epoch in range(N + 1):
+    rounds_list = []
+    for rounds in range(N + 1):
         # initial model
         s_model = FedUA(s_x.shape[1], args.dim)
         t_model = FedUA(t_x.shape[1], args.dim)
@@ -240,9 +286,9 @@ if __name__ == "__main__":
 
         # Perform federated training
         # print("Performing federated learning...\n")
-        for round in range(args.rounds):
+        for round in range(rounds):
             s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
-                            args.lr, args.lamda, args.margin, args.neg, epoch)
+                            args.lr, args.lamda, args.margin, args.neg, args.epochs)
             # Merge local model
             for key in global_model_state_dict.keys():
                 global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
@@ -262,14 +308,13 @@ if __name__ == "__main__":
 
         # results['time'] += t3
         # print(f'Total runtime: {t3:.4f} s')
-        p1.append(result['Precision@1'])
         p10.append(result['Precision@10'])
         mrr.append(result['MRR'])
-        epochs.append(epoch)
-        print(f"=== round {epoch} ===")
+        rounds_list.append(rounds)
+        print(f"=== round {rounds} ===")
 
-    for i, output, labels in zip(range(3), [p1, p10, mrr], ['Precision@1', 'Precision@10', 'MRR']):
-        axs[i].plot(epochs, output, label=labels)
+    for i, output, labels in zip(range(2), [p10, mrr], ['Precision@10', 'MRR']):
+        axs[i].plot(rounds_list, output, label=labels)
         axs[i].set_xlabel('Epoch')
         axs[i].set_ylabel(labels)
         axs[i].set_title(f'{labels} vs Epoch')
@@ -277,3 +322,9 @@ if __name__ == "__main__":
 
     plt.tight_layout()
     plt.savefig(f'pics/FedEpoch.png')
+
+    # print('\nCCNE with Federated Learning')
+    # print(args)
+    # print('Average results:')
+    # for k, v in results.items():
+    #     print(f'{k}: {v:.4f}')

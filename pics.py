@@ -2,7 +2,8 @@ import os
 import re
 import matplotlib.pyplot as plt
 
-train_file = ['FedGAN', 'FedWoNeg', 'CCNE']
+train_file = ['FedGAN', 'CCNE']
+datasets = ['douban', 'twitter1_youtube']
 makers = ['.', 'x', 's']
 
 def extract_results(file_path):
@@ -23,25 +24,26 @@ def extract_results(file_path):
     return results
 
 def plot_pK():
-    fig, axs = plt.subplots(1, 1, figsize=(5, 5))
+    fig, axs = plt.subplots(1, len(datasets), figsize=(10, 5))
 
-    for i in range(3):
-        file = 'output/douban/' + train_file[i] + '_tr=0.8.txt'
-        results = extract_results(file)
-        p_values = [results[f'Precision@{k}'] for k in [1, 5, 10, 15, 20, 25, 30]]
+    for i in range(len(datasets)):
+        for j in range(len(train_file)):
+            file = f'output/{datasets[i]}/{train_file[j]}_tr=0.8.txt'
+            results = extract_results(file)
+            p_values = [results[f'Precision@{k}'] for k in [1, 5, 10, 15, 20, 25, 30]]
 
 
-        axs.plot([1, 5, 10, 15, 20, 25, 30], p_values, marker=makers[i], label=train_file[i])
-    axs.set_xlabel('K')
-    axs.set_ylabel('Precision@K')
-    axs.grid(True)
+            axs[i].plot([1, 5, 10, 15, 20, 25, 30], p_values, marker=makers[j], label=train_file[j])
+        axs[i].set_xlabel('K')
+        axs[i].set_ylabel('Precision@K')
+        axs[i].grid(True)
 
     plt.tight_layout()
     plt.legend()
     plt.savefig('pics/pK.png')
 
 def plot_ratio_mmr_pk():
-    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    fig, axs = plt.subplots(2, len(datasets), figsize=(10, 10))
 
     output_dir = f'output/douban'
     for i in range(3):
@@ -121,6 +123,6 @@ def plot_margin_dim():
 
 
 if __name__ == '__main__':
-    plot_ratio_mmr_pk()
+    # plot_ratio_mmr_pk()
     # plot_margin_dim()
     plot_pK()

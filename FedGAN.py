@@ -239,7 +239,7 @@ if __name__ == "__main__":
         start_time = time()
         args = parse_args()
 
-        print('Load data...')
+        # print('Load data...')
         # genetate adjacency matrix
         s_adj = get_adj(args.s_edge)
         t_adj = get_adj(args.t_edge)
@@ -261,7 +261,7 @@ if __name__ == "__main__":
         g_t = nx.Graph()
         g_t.add_edges_from(t_edge)
 
-        print('Generate deepwalk embeddings as input X...')
+        # print('Generate deepwalk embeddings as input X...')
         s_x = node2vec(s_adj, P=1, Q=1, WINDOW_SIZE=10, NUM_WALKS=10, WALK_LENGTH=80, DIMENSIONS=128, \
             WORKERS=8, ITER=5, verbose=1)
         t_x = node2vec(t_adj, P=1, Q=1, WINDOW_SIZE=10, NUM_WALKS=10, WALK_LENGTH=80, DIMENSIONS=128, \
@@ -270,7 +270,7 @@ if __name__ == "__main__":
         t_x = torch.FloatTensor(t_x)
         time1 = time()
         t1 = time1 - start_time
-        print('Finished in %.4f s!'%(t1))
+        # print('Finished in %.4f s!'%(t1))
 
         # initial model
         s_model = FedUA(s_x.shape[1], args.dim)
@@ -279,7 +279,7 @@ if __name__ == "__main__":
         global_model_state_dict = globel_model.state_dict()
 
         # Perform federated training
-        print("Performing federated learning...\n")
+        # print("Performing federated learning...\n")
         for round in range(args.rounds):
             s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
                             args.lr, args.lamda, args.margin, args.neg, args.epochs)
@@ -292,7 +292,7 @@ if __name__ == "__main__":
             for key in t_state_dict.keys():
                 t_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + t_state_dict[key] * (1 - args.alpha)
 
-        print("Finished federated learning!\n")
+        # print("Finished federated learning!\n")
         S = cosine_similarity(s_embedding, t_embedding)  # Example evaluation logic
         result = get_statistics(S, groundtruth_matrix)
         t3 = time() - start_time
@@ -301,12 +301,12 @@ if __name__ == "__main__":
             results[k] += v
 
         results['time'] += t3
-        print(f'Total runtime: {t3:.4f} s')
+        # print(f'Total runtime: {t3:.4f} s')
 
     for k, v in results.items():
         results[k] /= N
 
-    print('\nCCNE with Federated Learning')
+    # print('\nCCNE with Federated Learning')
     print(args)
     print('Average results:')
     for k, v in results.items():
