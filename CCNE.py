@@ -124,7 +124,7 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, anchor, gt_mat, dim=64, lr=0.001
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     cosine_loss=nn.CosineEmbeddingLoss(margin=margin)
-    in_a, in_b, anchor_label = sample(anchor, g_s, g_t, neg=neg) # hard negative sampling
+    in_a, in_b, anchor_label = sample(anchor) # hard negative sampling
 
     for epoch in range(epochs):
         model.train()
@@ -163,53 +163,81 @@ def evaluate(zs, zt, gt):
     precision_10 = compute_precision_k(pred_top_10, gt)
     return precision_10
 
-def sample(anchor_train, gs, gt, neg=1):
+def sample(anchor_train):
     '''
-    sample non-anchors for each anchor
+    sample for each anchor without negative sampling
     '''
-    triplet_neg = neg  # number of non-anchors for each anchor, when neg=1, there are two negtives for each anchor
-    anchor_flag = 1
     anchor_train_len = anchor_train.shape[0]
     anchor_train_a_list = np.array(anchor_train.T[0])
     anchor_train_b_list = np.array(anchor_train.T[1])
     input_a = []
     input_b = []
     classifier_target = torch.empty(0)
-    np.random.seed(5)
-    index = 0
-    while index < anchor_train_len:
+    
+    for index in range(anchor_train_len):
         a = anchor_train_a_list[index]
         b = anchor_train_b_list[index]
+        
         input_a.append(a)
         input_b.append(b)
-        an_target = torch.ones(anchor_flag)
+        an_target = torch.ones(1)  
         classifier_target = torch.cat((classifier_target, an_target), dim=0)
-        an_negs_index = list(set(gt.nodes()) - {b}) # all nodes except anchor node
-        # an_negs_index = list(gt.neighbors(b)) # neighbors of each anchor node
-        an_negs_index_sampled = list(np.random.choice(an_negs_index, triplet_neg, replace=True)) # randomly sample negatives
-        an_as = triplet_neg * [a]
-        input_a += an_as
-        input_b += an_negs_index_sampled
 
-        an_negs_index1 = list(set(gs.nodes()) - {a})
-        # an_negs_index1 = list(gs.neighbors(a))
-        an_negs_index_sampled1 = list(np.random.choice(an_negs_index1, triplet_neg, replace=True))
-        an_as1 = triplet_neg * [b]
-        input_b += an_as1
-        input_a += an_negs_index_sampled1
-
-        un_an_target = torch.zeros(triplet_neg * 2)
-        classifier_target = torch.cat((classifier_target, un_an_target), dim=0)
-        index += 1
-
-    cosine_target = torch.unsqueeze(2 * classifier_target - 1, dim=1)  # labels are [1,-1,-1]
-    # classifier_target = torch.unsqueeze(classifier_target, dim=1)  # labels are [1,0,0]
-
+    cosine_target = torch.unsqueeze(2 * classifier_target - 1, dim=1)  # labels are [1]
+    
     # [ina, inb] is all anchors and sampled non-anchors, cosine_target is their labels
     ina = torch.LongTensor(input_a)
     inb = torch.LongTensor(input_b)
 
     return ina, inb, cosine_target
+
+# def sample(anchor_train, gs, gt, neg=1):
+#     '''
+#     sample non-anchors for each anchor
+#     '''
+#     triplet_neg = neg  # number of non-anchors for each anchor, when neg=1, there are two negtives for each anchor
+#     anchor_flag = 1
+#     anchor_train_len = anchor_train.shape[0]
+#     anchor_train_a_list = np.array(anchor_train.T[0])
+#     anchor_train_b_list = np.array(anchor_train.T[1])
+#     input_a = []
+#     input_b = []
+#     classifier_target = torch.empty(0)
+#     np.random.seed(5)
+#     index = 0
+#     while index < anchor_train_len:
+#         a = anchor_train_a_list[index]
+#         b = anchor_train_b_list[index]
+#         input_a.append(a)
+#         input_b.append(b)
+#         an_target = torch.ones(anchor_flag)
+#         classifier_target = torch.cat((classifier_target, an_target), dim=0)
+#         an_negs_index = list(set(gt.nodes()) - {b}) # all nodes except anchor node
+#         # an_negs_index = list(gt.neighbors(b)) # neighbors of each anchor node
+#         an_negs_index_sampled = list(np.random.choice(an_negs_index, triplet_neg, replace=True)) # randomly sample negatives
+#         an_as = triplet_neg * [a]
+#         input_a += an_as
+#         input_b += an_negs_index_sampled
+
+#         an_negs_index1 = list(set(gs.nodes()) - {a})
+#         # an_negs_index1 = list(gs.neighbors(a))
+#         an_negs_index_sampled1 = list(np.random.choice(an_negs_index1, triplet_neg, replace=True))
+#         an_as1 = triplet_neg * [b]
+#         input_b += an_as1
+#         input_a += an_negs_index_sampled1
+
+#         un_an_target = torch.zeros(triplet_neg * 2)
+#         classifier_target = torch.cat((classifier_target, un_an_target), dim=0)
+#         index += 1
+
+#     cosine_target = torch.unsqueeze(2 * classifier_target - 1, dim=1)  # labels are [1,-1,-1]
+#     # classifier_target = torch.unsqueeze(classifier_target, dim=1)  # labels are [1,0,0]
+
+#     # [ina, inb] is all anchors and sampled non-anchors, cosine_target is their labels
+#     ina = torch.LongTensor(input_a)
+#     inb = torch.LongTensor(input_b)
+
+#     return ina, inb, cosine_target
 
 def expand_edges(g_s, g_t, seeds, s_edge, t_edge):
     '''
