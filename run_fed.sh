@@ -12,11 +12,11 @@ mkdir output/${DATASETS[0]}
 mkdir output/${DATASETS[1]}
 mkdir output/${DATASETS[2]}
 
-DATASET=${DATASETS[1]}
+DATASET=${DATASETS[0]}
 PD=data/${DATASET}
-PREFIX1=${PREFIX1S[1]}
-PREFIX2=${PREFIX2S[1]}
-TRAINRATIO=0.1
+PREFIX1=${PREFIX1S[0]}
+PREFIX2=${PREFIX2S[0]}
+TRAINRATIO=0.8
 
 python ${RUNFILE}.py \
 --s_edge ${PD}/${PREFIX1}/raw/edgelist \

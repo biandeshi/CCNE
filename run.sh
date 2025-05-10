@@ -13,9 +13,9 @@ mkdir output/${DATASETS[1]}
 mkdir output/${DATASETS[2]}
 
 # for i in "${!DATASETS[@]}"; do
-DATASET=${DATASETS[0]}
-PREFIX1=${PREFIX1S[0]}
-PREFIX2=${PREFIX2S[0]}
+DATASET=${DATASETS[2]}
+PREFIX1=${PREFIX1S[2]}
+PREFIX2=${PREFIX2S[2]}
 PD=data/${DATASET}
 
 for TRAINRATIO in $(seq 0.1 0.1 0.9); do

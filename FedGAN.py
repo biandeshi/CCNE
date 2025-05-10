@@ -100,7 +100,7 @@ def get_intra_loss(s_model, t_model):
     return s_model.intra_loss + t_model.intra_loss
 
 
-def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat, dim=64, lr=0.001, lamda=1, margin=0.8, neg=1, epochs=1000):
+def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, anchor, gt_mat, alpha=0.1, dim=64, lr=0.001, lamda=1, margin=0.8, neg=1, epochs=1000):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # 初始化Critic
     critic = Critic(dim).to(device)
@@ -172,14 +172,14 @@ def get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model,anchor, gt_mat,
         fake_scores = critic(zs)
         loss_adv = -torch.mean(fake_scores)
 
-        loss = intra_loss + lamda * inter_loss + 0.1 * loss_adv
+        loss = intra_loss + lamda * inter_loss + 0.001 * loss_adv
         loss.backward()
         s_optimizer.step()
         t_optimizer.step()
-        # if epoch % 100 == 0:
-        #     p10 = evaluate(zs, zt, gt_mat)
-        #     print('Epoch: {:03d}, intra_loss: {:.8f}, inter_loss: {:.8f}, loss_train: {:.8f}, precision_10: {:.8f}'.format(epoch,\
-        #         intra_loss, inter_loss, loss, p10))
+        if epoch % 20 == 0:
+            p10 = evaluate(zs, zt, gt_mat)
+            print('Epoch: {:03d}, adv_loss: {:.8f} intra_loss: {:.8f}, inter_loss: {:.8f}, loss_train: {:.8f}, precision_10: {:.8f}'.format(epoch,\
+                loss_adv, intra_loss, inter_loss, loss, p10))
     
     # print("Federated local learning has been done...\n")
     s_model.eval()
@@ -234,7 +234,7 @@ def sample(anchor_train):
 if __name__ == "__main__":
     results = dict.fromkeys(('Acc', 'MRR', 'AUC', 'Hit', 'Precision@1', 'Precision@5', 'Precision@10', 'Precision@15', \
         'Precision@20', 'Precision@25', 'Precision@30', 'time'), 0) # save results
-    N = 5 # repeat times for average, default: 1
+    N = 1 # repeat times for average, default: 1
     for i in range(N):
         start_time = time()
         args = parse_args()
@@ -281,7 +281,7 @@ if __name__ == "__main__":
         # Perform federated training
         # print("Performing federated learning...\n")
         for round in range(args.rounds):
-            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
+            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.alpha, args.dim, 
                             args.lr, args.lamda, args.margin, args.neg, args.epochs)
             # Merge local model
             for key in global_model_state_dict.keys():

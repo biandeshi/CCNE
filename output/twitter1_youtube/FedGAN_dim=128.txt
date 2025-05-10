@@ -1,0 +1,68 @@
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Epoch: 000, adv_loss: 0.25536922 intra_loss: 3.28259134, inter_loss: 0.96070367, loss_train: 4.24355078, precision_10: 0.00000000
+Epoch: 020, adv_loss: 7.72765970 intra_loss: 2.05171537, inter_loss: 0.49255010, loss_train: 2.55199313, precision_10: 0.01307190
+Epoch: 040, adv_loss: 12.05229568 intra_loss: 1.96369839, inter_loss: 0.40584883, loss_train: 2.38159943, precision_10: 0.02941176
+Epoch: 060, adv_loss: 13.98403072 intra_loss: 1.89462602, inter_loss: 0.36634266, loss_train: 2.27495265, precision_10: 0.04248366
+Epoch: 080, adv_loss: 15.03489017 intra_loss: 1.86739850, inter_loss: 0.33101180, loss_train: 2.21344519, precision_10: 0.06862745
+Epoch: 100, adv_loss: 15.73971748 intra_loss: 1.84851623, inter_loss: 0.30680114, loss_train: 2.17105699, precision_10: 0.08169935
+Epoch: 120, adv_loss: 16.43173981 intra_loss: 1.83113396, inter_loss: 0.28435603, loss_train: 2.13192177, precision_10: 0.10784314
+Epoch: 140, adv_loss: 16.99070358 intra_loss: 1.82102299, inter_loss: 0.26405203, loss_train: 2.10206556, precision_10: 0.12091503
+Epoch: 160, adv_loss: 17.61486816 intra_loss: 1.81534505, inter_loss: 0.24634354, loss_train: 2.07930350, precision_10: 0.13398693
+Epoch: 180, adv_loss: 18.36015129 intra_loss: 1.80588341, inter_loss: 0.22840065, loss_train: 2.05264425, precision_10: 0.14052288
+Epoch: 000, adv_loss: 0.25703925 intra_loss: 1.80486989, inter_loss: 0.21290603, loss_train: 2.01803303, precision_10: 0.15686275
+Epoch: 020, adv_loss: 6.92465878 intra_loss: 1.80037880, inter_loss: 0.19719146, loss_train: 2.00449491, precision_10: 0.16339869
+Epoch: 040, adv_loss: 11.53697014 intra_loss: 1.80017841, inter_loss: 0.18201894, loss_train: 1.99373424, precision_10: 0.16339869
+Epoch: 060, adv_loss: 13.77865124 intra_loss: 1.79049706, inter_loss: 0.16766432, loss_train: 1.97194004, precision_10: 0.16666667
+Epoch: 080, adv_loss: 14.80981541 intra_loss: 1.78304338, inter_loss: 0.15438956, loss_train: 1.95224285, precision_10: 0.16993464
+Epoch: 100, adv_loss: 15.52506256 intra_loss: 1.78706932, inter_loss: 0.14107324, loss_train: 1.94366765, precision_10: 0.16993464
+Epoch: 120, adv_loss: 16.05900192 intra_loss: 1.77826476, inter_loss: 0.13010710, loss_train: 1.92443097, precision_10: 0.16993464
+Epoch: 140, adv_loss: 16.58447647 intra_loss: 1.77628112, inter_loss: 0.11978160, loss_train: 1.91264725, precision_10: 0.16993464
+Epoch: 160, adv_loss: 17.13315582 intra_loss: 1.77927601, inter_loss: 0.11082366, loss_train: 1.90723276, precision_10: 0.17647059
+Epoch: 180, adv_loss: 17.83268547 intra_loss: 1.76736903, inter_loss: 0.10296707, loss_train: 1.88816869, precision_10: 0.17647059
+Epoch: 000, adv_loss: 0.46565273 intra_loss: 1.76074839, inter_loss: 0.09596225, loss_train: 1.85717630, precision_10: 0.18627451
+Epoch: 020, adv_loss: 6.59172058 intra_loss: 1.76226640, inter_loss: 0.09532472, loss_train: 1.86418283, precision_10: 0.17647059
+Epoch: 040, adv_loss: 10.70069885 intra_loss: 1.77384901, inter_loss: 0.09281039, loss_train: 1.87736011, precision_10: 0.18300654
+Epoch: 060, adv_loss: 12.98536015 intra_loss: 1.76191461, inter_loss: 0.09122635, loss_train: 1.86612630, precision_10: 0.18627451
+Epoch: 080, adv_loss: 14.22504044 intra_loss: 1.76183915, inter_loss: 0.08939943, loss_train: 1.86546361, precision_10: 0.17647059
+Epoch: 100, adv_loss: 15.12771034 intra_loss: 1.77057576, inter_loss: 0.08756622, loss_train: 1.87326968, precision_10: 0.17973856
+Epoch: 120, adv_loss: 15.87333202 intra_loss: 1.76337445, inter_loss: 0.08533223, loss_train: 1.86458004, precision_10: 0.17973856
+Epoch: 140, adv_loss: 16.45476151 intra_loss: 1.76916814, inter_loss: 0.08307776, loss_train: 1.86870074, precision_10: 0.17973856
+Epoch: 160, adv_loss: 17.17895699 intra_loss: 1.76068616, inter_loss: 0.08141508, loss_train: 1.85928023, precision_10: 0.18627451
+Epoch: 180, adv_loss: 17.91709137 intra_loss: 1.75428843, inter_loss: 0.07951307, loss_train: 1.85171854, precision_10: 0.17320261
+Epoch: 000, adv_loss: 0.46531790 intra_loss: 1.75015175, inter_loss: 0.07763279, loss_train: 1.82824981, precision_10: 0.17973856
+Epoch: 020, adv_loss: 7.54083109 intra_loss: 1.76250076, inter_loss: 0.08297293, loss_train: 1.85301447, precision_10: 0.16993464
+Epoch: 040, adv_loss: 11.89795780 intra_loss: 1.76213765, inter_loss: 0.07783808, loss_train: 1.85187364, precision_10: 0.17647059
+Epoch: 060, adv_loss: 13.87600613 intra_loss: 1.75219691, inter_loss: 0.07522034, loss_train: 1.84129322, precision_10: 0.17647059
+Epoch: 080, adv_loss: 14.99845886 intra_loss: 1.74978447, inter_loss: 0.07436243, loss_train: 1.83914530, precision_10: 0.17320261
+Epoch: 100, adv_loss: 15.61483860 intra_loss: 1.74933624, inter_loss: 0.07355566, loss_train: 1.83850682, precision_10: 0.17647059
+Epoch: 120, adv_loss: 16.15759087 intra_loss: 1.75375628, inter_loss: 0.07267206, loss_train: 1.84258592, precision_10: 0.16993464
+Epoch: 140, adv_loss: 16.72368813 intra_loss: 1.74981380, inter_loss: 0.07177536, loss_train: 1.83831275, precision_10: 0.16993464
+Epoch: 160, adv_loss: 17.37318230 intra_loss: 1.75037122, inter_loss: 0.07051564, loss_train: 1.83826005, precision_10: 0.17973856
+Epoch: 180, adv_loss: 18.15648842 intra_loss: 1.74660408, inter_loss: 0.06973861, loss_train: 1.83449924, precision_10: 0.16666667
+Epoch: 000, adv_loss: 0.89294660 intra_loss: 1.74800301, inter_loss: 0.06836860, loss_train: 1.81726456, precision_10: 0.16993464
+Epoch: 020, adv_loss: 6.92884541 intra_loss: 1.74616313, inter_loss: 0.07220118, loss_train: 1.82529306, precision_10: 0.16013072
+Epoch: 040, adv_loss: 11.02691650 intra_loss: 1.75290060, inter_loss: 0.06792848, loss_train: 1.83185589, precision_10: 0.16013072
+Epoch: 060, adv_loss: 13.19656086 intra_loss: 1.73901200, inter_loss: 0.06704582, loss_train: 1.81925440, precision_10: 0.16666667
+Epoch: 080, adv_loss: 14.43979740 intra_loss: 1.74458528, inter_loss: 0.06582060, loss_train: 1.82484567, precision_10: 0.15686275
+Epoch: 100, adv_loss: 15.21039581 intra_loss: 1.74157763, inter_loss: 0.06529045, loss_train: 1.82207847, precision_10: 0.16993464
+Epoch: 120, adv_loss: 15.77735996 intra_loss: 1.74440765, inter_loss: 0.06429984, loss_train: 1.82448483, precision_10: 0.16666667
+Epoch: 140, adv_loss: 16.32493973 intra_loss: 1.73819852, inter_loss: 0.06349625, loss_train: 1.81801975, precision_10: 0.16666667
+Epoch: 160, adv_loss: 17.13658333 intra_loss: 1.74534249, inter_loss: 0.06253003, loss_train: 1.82500911, precision_10: 0.16993464
+Epoch: 180, adv_loss: 17.77148056 intra_loss: 1.74269927, inter_loss: 0.06171308, loss_train: 1.82218385, precision_10: 0.15686275
+True matched nodes: 16
+Total test nodes: 306
+Namespace(alpha=1.0, dim=128, epochs=200, gt_path='data/twitter1_youtube/anchor/node,split=0.9.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/twitter1_youtube/embeddings', rounds=5, s_edge='data/twitter1_youtube/twitter1/raw/edgelist', t_edge='data/twitter1_youtube/youtube/raw/edgelist', train_path='data/twitter1_youtube/anchor/node,split=0.9.train.dict')
+Average results:
+Acc: 0.0523
+MRR: 0.0868
+AUC: 0.8460
+Hit: 0.8460
+Precision@1: 0.0490
+Precision@5: 0.1144
+Precision@10: 0.1634
+Precision@15: 0.2124
+Precision@20: 0.2418
+Precision@25: 0.2549
+Precision@30: 0.2712
+time: 279.6963
