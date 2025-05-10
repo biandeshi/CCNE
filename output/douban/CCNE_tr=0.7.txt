@@ -2,47 +2,47 @@ Load data...
 Generate deepwalk embeddings as input X...
 Preprocessing grpah for node2vec... p= 1  q= 1
 Preprocessing grpah for node2vec... p= 1  q= 1
-Finished in 31.3147 s!
+Finished in 40.4248 s!
 Generate embeddings...
-Epoch: 000, intra_loss: 4.41762257, inter_loss: 0.21971543, loss_train: 4.63733816, precision_10: 0.00892857
-Epoch: 100, intra_loss: 1.56358528, inter_loss: 0.13184574, loss_train: 1.69543099, precision_10: 0.58333333
-Epoch: 200, intra_loss: 1.52030635, inter_loss: 0.08987770, loss_train: 1.61018407, precision_10: 0.74404762
-Epoch: 300, intra_loss: 1.52726197, inter_loss: 0.07167099, loss_train: 1.59893298, precision_10: 0.78869048
-Epoch: 400, intra_loss: 1.49711263, inter_loss: 0.06165213, loss_train: 1.55876482, precision_10: 0.83035714
-Epoch: 500, intra_loss: 1.49470448, inter_loss: 0.05524131, loss_train: 1.54994583, precision_10: 0.85714286
-Epoch: 600, intra_loss: 1.50165880, inter_loss: 0.05077514, loss_train: 1.55243397, precision_10: 0.87500000
-Epoch: 700, intra_loss: 1.50909352, inter_loss: 0.04670734, loss_train: 1.55580091, precision_10: 0.87500000
-Epoch: 800, intra_loss: 1.49243593, inter_loss: 0.04390839, loss_train: 1.53634429, precision_10: 0.88988095
-Epoch: 900, intra_loss: 1.48952174, inter_loss: 0.04139998, loss_train: 1.53092170, precision_10: 0.88988095
-Finished in 29.9488 s!
+Epoch: 000, intra_loss: 5.07093143, inter_loss: 0.61678767, loss_train: 5.68771935, precision_10: 0.00595238
+Epoch: 100, intra_loss: 1.58750319, inter_loss: 0.22994427, loss_train: 1.81744742, precision_10: 0.71428571
+Epoch: 200, intra_loss: 1.56977761, inter_loss: 0.14478916, loss_train: 1.71456671, precision_10: 0.80059524
+Epoch: 300, intra_loss: 1.54645896, inter_loss: 0.11045380, loss_train: 1.65691280, precision_10: 0.82440476
+Epoch: 400, intra_loss: 1.53154469, inter_loss: 0.09239174, loss_train: 1.62393641, precision_10: 0.85119048
+Epoch: 500, intra_loss: 1.53755617, inter_loss: 0.07961384, loss_train: 1.61716998, precision_10: 0.85416667
+Epoch: 600, intra_loss: 1.51947045, inter_loss: 0.07040004, loss_train: 1.58987045, precision_10: 0.88392857
+Epoch: 700, intra_loss: 1.51478434, inter_loss: 0.06371737, loss_train: 1.57850170, precision_10: 0.87797619
+Epoch: 800, intra_loss: 1.52074349, inter_loss: 0.05849876, loss_train: 1.57924223, precision_10: 0.87500000
+Epoch: 900, intra_loss: 1.51098084, inter_loss: 0.05420042, loss_train: 1.56518126, precision_10: 0.88392857
+Finished in 209.2975 s!
 Evaluating...
-True matched nodes: 124
+True matched nodes: 128
 Total test nodes: 336
-Acc: 0.3690
-MRR: 0.5664
+Acc: 0.3810
+MRR: 0.5808
 AUC: 0.9949
 Hit: 0.9949
-Precision@1: 0.3958
+Precision@1: 0.4286
 Precision@5: 0.7798
-Precision@10: 0.8899
+Precision@10: 0.8810
 Precision@15: 0.9226
-Precision@20: 0.9405
-Precision@25: 0.9583
-Precision@30: 0.9643
-Total runtime: 64.0256 s
+Precision@20: 0.9435
+Precision@25: 0.9494
+Precision@30: 0.9583
+Total runtime: 252.1280 s
 
 CCNE
 Namespace(dim=128, epochs=1000, gt_path='data/douban/anchor/node,split=0.7.test.dict', lamda=1, lr=0.001, margin=0.9, neg=1, out_path='data/douban/embeddings', s_edge='data/douban/online/raw/edgelist', t_edge='data/douban/offline/raw/edgelist', train_path='data/douban/anchor/node,split=0.7.train.dict')
 Average results:
-Acc: 0.3690
-MRR: 0.5664
+Acc: 0.3810
+MRR: 0.5808
 AUC: 0.9949
 Hit: 0.9949
-Precision@1: 0.3958
+Precision@1: 0.4286
 Precision@5: 0.7798
-Precision@10: 0.8899
+Precision@10: 0.8810
 Precision@15: 0.9226
-Precision@20: 0.9405
-Precision@25: 0.9583
-Precision@30: 0.9643
-time: 64.0256
+Precision@20: 0.9435
+Precision@25: 0.9494
+Precision@30: 0.9583
+time: 252.1280
