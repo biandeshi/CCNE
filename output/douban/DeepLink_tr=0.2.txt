@@ -1,0 +1,13 @@
+Precision@1: 0.2450
+
+Precision@5: 0.5620
+
+Precision@10: 0.6625
+
+Precision@15: 0.7150
+
+Precision@20: 0.7480
+
+Precision@25: 0.7730
+
+Precision@30: 0.7920
