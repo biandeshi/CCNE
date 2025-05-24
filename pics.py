@@ -192,7 +192,7 @@ def plot_ratio_pk(dataset):
     
 
 def plot_dim():
-    fig, axs = plt.subplots(1, 1, figsize=(5, 5))
+    fig, axs = plt.subplots(1, 1, figsize=(6, 6))
 
     output_dir = f'output/{datasets[1]}'
     pks = []
@@ -221,8 +221,8 @@ def plot_dim():
 if __name__ == '__main__':
     plt.rcParams.update({'font.size': 16})
     plot_dim()
-    plot_ratio_mrr_p10()
-    plot_pK()
+    # plot_ratio_mrr_p10()
+    # plot_pK()
     # for dataset in datasets:
         # plot_pK(dataset)
         # plot_ratio_pk(dataset)
