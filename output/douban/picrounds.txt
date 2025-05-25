@@ -1,0 +1,32 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 37.7625 s!
+True matched nodes: 37
+Total test nodes: 112
+round 1: 0.8304
+True matched nodes: 42
+Total test nodes: 112
+round 2: 0.8750
+True matched nodes: 40
+Total test nodes: 112
+round 3: 0.8839
+True matched nodes: 47
+Total test nodes: 112
+round 4: 0.9554
+True matched nodes: 47
+Total test nodes: 112
+round 5: 0.9196
+True matched nodes: 49
+Total test nodes: 112
+round 6: 0.9107
+True matched nodes: 51
+Total test nodes: 112
+round 7: 0.9375
+True matched nodes: 53
+Total test nodes: 112
+round 8: 0.9286
+True matched nodes: 51
+Total test nodes: 112
+round 9: 0.9107

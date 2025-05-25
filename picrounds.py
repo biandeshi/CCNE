@@ -273,11 +273,7 @@ if __name__ == "__main__":
     print('Finished in %.4f s!'%(t1))
 
     N = 500
-    fig, axs = plt.subplots(1, 2, figsize=(10, 6))
-    p10 = []
-    mrr = []
-    rounds_list = []
-    for rounds in range(N + 1):
+    for rounds in range(1, N + 1):
         # initial model
         s_model = FedUA(s_x.shape[1], args.dim)
         t_model = FedUA(t_x.shape[1], args.dim)
@@ -308,20 +304,7 @@ if __name__ == "__main__":
 
         # results['time'] += t3
         # print(f'Total runtime: {t3:.4f} s')
-        p10.append(result['Precision@10'])
-        mrr.append(result['MRR'])
-        rounds_list.append(rounds)
-        print(f"=== round {rounds} ===")
-
-    for i, output, labels in zip(range(2), [p10, mrr], ['Precision@10', 'MRR']):
-        axs[i].plot(rounds_list, output, label=labels)
-        axs[i].set_xlabel('Epoch')
-        axs[i].set_ylabel(labels)
-        axs[i].set_title(f'{labels} vs Epoch')
-        axs[i].grid(True)
-
-    plt.tight_layout()
-    plt.savefig(f'pics/FedEpoch.png')
+        print(f"round {rounds}: {result['Precision@10']:.4f}")
 
     # print('\nCCNE with Federated Learning')
     # print(args)

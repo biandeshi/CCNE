@@ -217,10 +217,41 @@ def plot_dim():
     plt.savefig('pics/P10_2_dim.png')
     plt.tight_layout()
 
+def plot_rounds():
+    fig, axs = plt.subplots(1, 1, figsize=(6, 6))
+
+    # Regular expression to match 'round x: y' format
+    round_pattern = re.compile(r'round (\d+): ([0-9.]+)')
+
+    round_list = []
+    p10_list = []
+
+    # Read the file line by line
+    with open(f'output/{datasets[0]}/picrounds.txt', 'r') as file:
+        for line in file:
+            line = line.strip()
+            
+            # Match round x: y pattern
+            round_match = round_pattern.match(line)
+            if round_match:
+                round = int(round_match.group(1))
+                p10 = float(round_match.group(2))
+                round_list.append(round)
+                p10_list.append(p10)
+
+    axs.plot(round_list, p10_list, marker='o', label='Precision@10')
+    axs.set_xlabel('round')
+    axs.set_ylabel('Precision@10')
+    axs.set_title(f'Precision@10 vs Round')
+    axs.grid(True)
+
+    plt.savefig('pics/P10_2_rounds.png')
+    plt.tight_layout()
 
 if __name__ == '__main__':
     plt.rcParams.update({'font.size': 16})
-    plot_dim()
+    plot_rounds()
+    # plot_dim()
     # plot_ratio_mrr_p10()
     # plot_pK()
     # for dataset in datasets:
