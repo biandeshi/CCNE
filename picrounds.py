@@ -272,8 +272,9 @@ if __name__ == "__main__":
     t1 = time1 - start_time
     print('Finished in %.4f s!'%(t1))
 
-    N = 500
-    for rounds in range(1, N + 1):
+    start_round = 63
+    end_round = 100
+    for rounds in range(start_round, end_round):
         # initial model
         s_model = FedUA(s_x.shape[1], args.dim)
         t_model = FedUA(t_x.shape[1], args.dim)

@@ -227,7 +227,7 @@ def plot_rounds():
     p10_list = []
 
     # Read the file line by line
-    with open(f'output/{datasets[0]}/picrounds.txt', 'r') as file:
+    with open(f'output/{datasets[1]}/picrounds.txt', 'r') as file:
         for line in file:
             line = line.strip()
             

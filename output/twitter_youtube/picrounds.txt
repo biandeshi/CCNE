@@ -1,0 +1,307 @@
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 67.8465 s!
+True matched nodes: 9
+Total test nodes: 306
+round 1: 0.1863
+True matched nodes: 19
+Total test nodes: 306
+round 2: 0.2386
+True matched nodes: 17
+Total test nodes: 306
+round 3: 0.2222
+True matched nodes: 26
+Total test nodes: 306
+round 4: 0.2320
+True matched nodes: 26
+Total test nodes: 306
+round 5: 0.2386
+True matched nodes: 26
+Total test nodes: 306
+round 6: 0.2255
+True matched nodes: 27
+Total test nodes: 306
+round 7: 0.2353
+True matched nodes: 24
+Total test nodes: 306
+round 8: 0.2386
+True matched nodes: 27
+Total test nodes: 306
+round 9: 0.2484
+True matched nodes: 31
+Total test nodes: 306
+round 10: 0.2614
+True matched nodes: 29
+Total test nodes: 306
+round 11: 0.2614
+True matched nodes: 36
+Total test nodes: 306
+round 12: 0.2582
+True matched nodes: 34
+Total test nodes: 306
+round 13: 0.2614
+True matched nodes: 34
+Total test nodes: 306
+round 14: 0.2680
+True matched nodes: 30
+Total test nodes: 306
+round 15: 0.2778
+True matched nodes: 29
+Total test nodes: 306
+round 16: 0.2712
+True matched nodes: 34
+Total test nodes: 306
+round 17: 0.2614
+True matched nodes: 34
+Total test nodes: 306
+round 18: 0.2843
+True matched nodes: 35
+Total test nodes: 306
+round 19: 0.2778
+True matched nodes: 36
+Total test nodes: 306
+round 20: 0.2778
+True matched nodes: 36
+Total test nodes: 306
+round 21: 0.2778
+True matched nodes: 37
+Total test nodes: 306
+round 22: 0.2712
+True matched nodes: 34
+Total test nodes: 306
+round 23: 0.2876
+True matched nodes: 38
+Total test nodes: 306
+round 24: 0.2843
+True matched nodes: 34
+Total test nodes: 306
+round 25: 0.2680
+True matched nodes: 35
+Total test nodes: 306
+round 26: 0.2843
+True matched nodes: 38
+Total test nodes: 306
+round 27: 0.2680
+True matched nodes: 41
+Total test nodes: 306
+round 28: 0.2908
+True matched nodes: 37
+Total test nodes: 306
+round 29: 0.2680
+True matched nodes: 35
+Total test nodes: 306
+round 30: 0.2778
+True matched nodes: 31
+Total test nodes: 306
+round 31: 0.2647
+True matched nodes: 37
+Total test nodes: 306
+round 32: 0.2908
+True matched nodes: 41
+Total test nodes: 306
+round 33: 0.2876
+True matched nodes: 36
+Total test nodes: 306
+round 34: 0.2876
+True matched nodes: 41
+Total test nodes: 306
+round 35: 0.3007
+True matched nodes: 42
+Total test nodes: 306
+round 36: 0.2876
+True matched nodes: 39
+Total test nodes: 306
+round 37: 0.2908
+True matched nodes: 35
+Total test nodes: 306
+round 38: 0.2745
+True matched nodes: 40
+Total test nodes: 306
+round 39: 0.2745
+True matched nodes: 29
+Total test nodes: 306
+round 40: 0.2941
+True matched nodes: 35
+Total test nodes: 306
+round 41: 0.2680
+True matched nodes: 38
+Total test nodes: 306
+round 42: 0.2810
+True matched nodes: 40
+Total test nodes: 306
+round 43: 0.2778
+True matched nodes: 44
+Total test nodes: 306
+round 44: 0.2843
+True matched nodes: 38
+Total test nodes: 306
+round 45: 0.2876
+True matched nodes: 36
+Total test nodes: 306
+round 46: 0.2680
+True matched nodes: 32
+Total test nodes: 306
+round 47: 0.2712
+True matched nodes: 39
+Total test nodes: 306
+round 48: 0.2680
+True matched nodes: 32
+Total test nodes: 306
+round 49: 0.2810
+True matched nodes: 42
+Total test nodes: 306
+round 50: 0.2614
+True matched nodes: 33
+Total test nodes: 306
+round 51: 0.2843
+True matched nodes: 42
+Total test nodes: 306
+round 52: 0.3137
+True matched nodes: 35
+Total test nodes: 306
+round 53: 0.2810
+True matched nodes: 38
+Total test nodes: 306
+round 54: 0.2778
+True matched nodes: 33
+Total test nodes: 306
+round 55: 0.2876
+True matched nodes: 41
+Total test nodes: 306
+round 56: 0.2843
+True matched nodes: 41
+Total test nodes: 306
+round 57: 0.2843
+True matched nodes: 34
+Total test nodes: 306
+round 58: 0.2778
+True matched nodes: 36
+Total test nodes: 306
+round 59: 0.2810
+True matched nodes: 36
+Total test nodes: 306
+round 60: 0.2647
+True matched nodes: 34
+Total test nodes: 306
+round 61: 0.2712
+True matched nodes: 43
+Total test nodes: 306
+round 62: 0.2843
+Load data...
+Generate deepwalk embeddings as input X...
+Preprocessing grpah for node2vec... p= 1  q= 1
+Preprocessing grpah for node2vec... p= 1  q= 1
+Finished in 70.9517 s!
+True matched nodes: 37
+Total test nodes: 306
+round 63: 0.2712
+True matched nodes: 38
+Total test nodes: 306
+round 64: 0.2712
+True matched nodes: 37
+Total test nodes: 306
+round 65: 0.2647
+True matched nodes: 37
+Total test nodes: 306
+round 66: 0.2680
+True matched nodes: 31
+Total test nodes: 306
+round 67: 0.2974
+True matched nodes: 40
+Total test nodes: 306
+round 68: 0.2908
+True matched nodes: 40
+Total test nodes: 306
+round 69: 0.2810
+True matched nodes: 40
+Total test nodes: 306
+round 70: 0.2908
+True matched nodes: 39
+Total test nodes: 306
+round 71: 0.2647
+True matched nodes: 41
+Total test nodes: 306
+round 72: 0.2843
+True matched nodes: 42
+Total test nodes: 306
+round 73: 0.2843
+True matched nodes: 44
+Total test nodes: 306
+round 74: 0.2614
+True matched nodes: 33
+Total test nodes: 306
+round 75: 0.2941
+True matched nodes: 37
+Total test nodes: 306
+round 76: 0.2549
+True matched nodes: 39
+Total test nodes: 306
+round 77: 0.2647
+True matched nodes: 39
+Total test nodes: 306
+round 78: 0.2778
+True matched nodes: 36
+Total test nodes: 306
+round 79: 0.2712
+True matched nodes: 34
+Total test nodes: 306
+round 80: 0.2614
+True matched nodes: 34
+Total test nodes: 306
+round 81: 0.2614
+True matched nodes: 39
+Total test nodes: 306
+round 82: 0.2647
+True matched nodes: 33
+Total test nodes: 306
+round 83: 0.2614
+True matched nodes: 37
+Total test nodes: 306
+round 84: 0.3007
+True matched nodes: 37
+Total test nodes: 306
+round 85: 0.2778
+True matched nodes: 47
+Total test nodes: 306
+round 86: 0.2908
+True matched nodes: 39
+Total test nodes: 306
+round 87: 0.2647
+True matched nodes: 41
+Total test nodes: 306
+round 88: 0.2810
+True matched nodes: 39
+Total test nodes: 306
+round 89: 0.2745
+True matched nodes: 45
+Total test nodes: 306
+round 90: 0.2941
+True matched nodes: 39
+Total test nodes: 306
+round 91: 0.2712
+True matched nodes: 41
+Total test nodes: 306
+round 92: 0.2778
+True matched nodes: 35
+Total test nodes: 306
+round 93: 0.2582
+True matched nodes: 37
+Total test nodes: 306
+round 94: 0.2549
+True matched nodes: 29
+Total test nodes: 306
+round 95: 0.2974
+True matched nodes: 30
+Total test nodes: 306
+round 96: 0.2647
+True matched nodes: 37
+Total test nodes: 306
+round 97: 0.2647
+True matched nodes: 38
+Total test nodes: 306
+round 98: 0.2810
+True matched nodes: 45
+Total test nodes: 306
+round 99: 0.2680

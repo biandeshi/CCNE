@@ -28,4 +28,4 @@ python ${RUNFILE}.py \
 --dim 128 \
 --lr ${LR} \
 --epochs ${EPOCHS} \
---alpha 1.0 > output/${DATASET}/${RUNFILE}.txt
+--alpha 1.0 >> output/${DATASET}/${RUNFILE}.txt
