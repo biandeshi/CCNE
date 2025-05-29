@@ -272,40 +272,43 @@ if __name__ == "__main__":
     t1 = time1 - start_time
     print('Finished in %.4f s!'%(t1))
 
-    start_round = 63
-    end_round = 100
+    start_round = 1
+    end_round = 30
     for rounds in range(start_round, end_round):
-        # initial model
-        s_model = FedUA(s_x.shape[1], args.dim)
-        t_model = FedUA(t_x.shape[1], args.dim)
-        globel_model = s_model
-        global_model_state_dict = globel_model.state_dict()
+        for _ in range(5):
+            # initial model
+            s_model = FedUA(s_x.shape[1], args.dim)
+            t_model = FedUA(t_x.shape[1], args.dim)
+            globel_model = s_model
+            global_model_state_dict = globel_model.state_dict()
 
-        # Perform federated training
-        # print("Performing federated learning...\n")
-        for round in range(rounds):
-            s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
-                            args.lr, args.lamda, args.margin, args.neg, args.epochs)
-            # Merge local model
-            for key in global_model_state_dict.keys():
-                global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
-            # Distribute globel model to local
-            for key in s_state_dict.keys():
-                s_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + s_state_dict[key] * (1 - args.alpha)
-            for key in t_state_dict.keys():
-                t_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + t_state_dict[key] * (1 - args.alpha)
+            # Perform federated training
+            # print("Performing federated learning...\n")
+            for round in range(rounds):
+                s_state_dict, t_state_dict, s_embedding, t_embedding = get_embedding(s_x, t_x, s_e, t_e, g_s, g_t, s_model, t_model, train_anchor, groundtruth_matrix, args.dim, 
+                                args.lr, args.lamda, args.margin, args.neg, args.epochs)
+                # Merge local model
+                for key in global_model_state_dict.keys():
+                    global_model_state_dict[key] = (s_state_dict[key] + t_state_dict[key]) / 2
+                # Distribute globel model to local
+                for key in s_state_dict.keys():
+                    s_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + s_state_dict[key] * (1 - args.alpha)
+                for key in t_state_dict.keys():
+                    t_model.state_dict()[key] = global_model_state_dict[key] * args.alpha + t_state_dict[key] * (1 - args.alpha)
 
-        # print("Finished federated learning!\n")
-        S = cosine_similarity(s_embedding, t_embedding)  # Example evaluation logic
-        result = get_statistics(S, groundtruth_matrix)
-        t3 = time() - start_time
-        # for k, v in result.items():
-            # print(f'{k}: {v:.4f}')
-            # results[k] += v
+            # print("Finished federated learning!\n")
+            S = cosine_similarity(s_embedding, t_embedding)  # Example evaluation logic
+            result = get_statistics(S, groundtruth_matrix)
+            t3 = time() - start_time
+            for k, v in result.items():
+                # print(f'{k}: {v:.4f}')
+                results[k] += v
 
-        # results['time'] += t3
-        # print(f'Total runtime: {t3:.4f} s')
-        print(f"round {rounds}: {result['Precision@10']:.4f}")
+            # results['time'] += t3
+            # print(f'Total runtime: {t3:.4f} s')
+        for k, v in results.items():
+            results[k] /= 5
+        print(f"round {rounds}: {results['Precision@10']:.4f}")
 
     # print('\nCCNE with Federated Learning')
     # print(args)
